@@ -1,0 +1,458 @@
+---
+:xdg_wm_base:
+  :version: 6
+  :requests:
+    :destroy:
+      :opcode: 0
+      :args: []
+    :create_positioner:
+      :opcode: 1
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :xdg_positioner
+    :get_xdg_surface:
+      :opcode: 2
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :xdg_surface
+      - :name: :surface
+        :type: :object
+        :interface: :wl_surface
+    :pong:
+      :opcode: 3
+      :args:
+      - :name: :serial
+        :type: :uint
+  :events:
+  - :opcode: 0
+    :name: :ping
+    :args:
+    - :name: :serial
+      :type: :uint
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :role
+      :value: 0
+    - :name: :defunct_surfaces
+      :value: 1
+    - :name: :not_the_topmost_popup
+      :value: 2
+    - :name: :invalid_popup_parent
+      :value: 3
+    - :name: :invalid_surface_state
+      :value: 4
+    - :name: :invalid_positioner
+      :value: 5
+    - :name: :unresponsive
+      :value: 6
+:xdg_positioner:
+  :version: 6
+  :requests:
+    :destroy:
+      :opcode: 0
+      :args: []
+    :set_size:
+      :opcode: 1
+      :args:
+      - :name: :width
+        :type: :int
+      - :name: :height
+        :type: :int
+    :set_anchor_rect:
+      :opcode: 2
+      :args:
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+      - :name: :width
+        :type: :int
+      - :name: :height
+        :type: :int
+    :set_anchor:
+      :opcode: 3
+      :args:
+      - :name: :anchor
+        :type: :uint
+        :enum: :anchor
+    :set_gravity:
+      :opcode: 4
+      :args:
+      - :name: :gravity
+        :type: :uint
+        :enum: :gravity
+    :set_constraint_adjustment:
+      :opcode: 5
+      :args:
+      - :name: :constraint_adjustment
+        :type: :uint
+    :set_offset:
+      :opcode: 6
+      :args:
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+    :set_reactive:
+      :opcode: 7
+      :args: []
+    :set_parent_size:
+      :opcode: 8
+      :args:
+      - :name: :parent_width
+        :type: :int
+      - :name: :parent_height
+        :type: :int
+    :set_parent_configure:
+      :opcode: 9
+      :args:
+      - :name: :serial
+        :type: :uint
+  :events: []
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :invalid_input
+      :value: 0
+  - :name: :anchor
+    :entries:
+    - :name: :none
+      :value: 0
+    - :name: :top
+      :value: 1
+    - :name: :bottom
+      :value: 2
+    - :name: :left
+      :value: 3
+    - :name: :right
+      :value: 4
+    - :name: :top_left
+      :value: 5
+    - :name: :bottom_left
+      :value: 6
+    - :name: :top_right
+      :value: 7
+    - :name: :bottom_right
+      :value: 8
+  - :name: :gravity
+    :entries:
+    - :name: :none
+      :value: 0
+    - :name: :top
+      :value: 1
+    - :name: :bottom
+      :value: 2
+    - :name: :left
+      :value: 3
+    - :name: :right
+      :value: 4
+    - :name: :top_left
+      :value: 5
+    - :name: :bottom_left
+      :value: 6
+    - :name: :top_right
+      :value: 7
+    - :name: :bottom_right
+      :value: 8
+  - :name: :constraint_adjustment
+    :entries:
+    - :name: :none
+      :value: 0
+    - :name: :slide_x
+      :value: 1
+    - :name: :slide_y
+      :value: 2
+    - :name: :flip_x
+      :value: 4
+    - :name: :flip_y
+      :value: 8
+    - :name: :resize_x
+      :value: 16
+    - :name: :resize_y
+      :value: 32
+:xdg_surface:
+  :version: 6
+  :requests:
+    :destroy:
+      :opcode: 0
+      :args: []
+    :get_toplevel:
+      :opcode: 1
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :xdg_toplevel
+    :get_popup:
+      :opcode: 2
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :xdg_popup
+      - :name: :parent
+        :type: :object
+        :interface: :xdg_surface
+        :allow_null: true
+      - :name: :positioner
+        :type: :object
+        :interface: :xdg_positioner
+    :set_window_geometry:
+      :opcode: 3
+      :args:
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+      - :name: :width
+        :type: :int
+      - :name: :height
+        :type: :int
+    :ack_configure:
+      :opcode: 4
+      :args:
+      - :name: :serial
+        :type: :uint
+  :events:
+  - :opcode: 0
+    :name: :configure
+    :args:
+    - :name: :serial
+      :type: :uint
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :not_constructed
+      :value: 1
+    - :name: :already_constructed
+      :value: 2
+    - :name: :unconfigured_buffer
+      :value: 3
+    - :name: :invalid_serial
+      :value: 4
+    - :name: :invalid_size
+      :value: 5
+    - :name: :defunct_role_object
+      :value: 6
+:xdg_toplevel:
+  :version: 6
+  :requests:
+    :destroy:
+      :opcode: 0
+      :args: []
+    :set_parent:
+      :opcode: 1
+      :args:
+      - :name: :parent
+        :type: :object
+        :interface: :xdg_toplevel
+        :allow_null: true
+    :set_title:
+      :opcode: 2
+      :args:
+      - :name: :title
+        :type: :string
+    :set_app_id:
+      :opcode: 3
+      :args:
+      - :name: :app_id
+        :type: :string
+    :show_window_menu:
+      :opcode: 4
+      :args:
+      - :name: :seat
+        :type: :object
+        :interface: :wl_seat
+      - :name: :serial
+        :type: :uint
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+    :move:
+      :opcode: 5
+      :args:
+      - :name: :seat
+        :type: :object
+        :interface: :wl_seat
+      - :name: :serial
+        :type: :uint
+    :resize:
+      :opcode: 6
+      :args:
+      - :name: :seat
+        :type: :object
+        :interface: :wl_seat
+      - :name: :serial
+        :type: :uint
+      - :name: :edges
+        :type: :uint
+        :enum: :resize_edge
+    :set_max_size:
+      :opcode: 7
+      :args:
+      - :name: :width
+        :type: :int
+      - :name: :height
+        :type: :int
+    :set_min_size:
+      :opcode: 8
+      :args:
+      - :name: :width
+        :type: :int
+      - :name: :height
+        :type: :int
+    :set_maximized:
+      :opcode: 9
+      :args: []
+    :unset_maximized:
+      :opcode: 10
+      :args: []
+    :set_fullscreen:
+      :opcode: 11
+      :args:
+      - :name: :output
+        :type: :object
+        :interface: :wl_output
+        :allow_null: true
+    :unset_fullscreen:
+      :opcode: 12
+      :args: []
+    :set_minimized:
+      :opcode: 13
+      :args: []
+  :events:
+  - :opcode: 0
+    :name: :configure
+    :args:
+    - :name: :width
+      :type: :int
+    - :name: :height
+      :type: :int
+    - :name: :states
+      :type: :array
+  - :opcode: 1
+    :name: :close
+    :args: []
+  - :opcode: 2
+    :name: :configure_bounds
+    :args:
+    - :name: :width
+      :type: :int
+    - :name: :height
+      :type: :int
+    :since: 4
+  - :opcode: 3
+    :name: :wm_capabilities
+    :args:
+    - :name: :capabilities
+      :type: :array
+    :since: 5
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :invalid_resize_edge
+      :value: 0
+    - :name: :invalid_parent
+      :value: 1
+    - :name: :invalid_size
+      :value: 2
+  - :name: :resize_edge
+    :entries:
+    - :name: :none
+      :value: 0
+    - :name: :top
+      :value: 1
+    - :name: :bottom
+      :value: 2
+    - :name: :left
+      :value: 4
+    - :name: :top_left
+      :value: 5
+    - :name: :bottom_left
+      :value: 6
+    - :name: :right
+      :value: 8
+    - :name: :top_right
+      :value: 9
+    - :name: :bottom_right
+      :value: 10
+  - :name: :state
+    :entries:
+    - :name: :maximized
+      :value: 1
+    - :name: :fullscreen
+      :value: 2
+    - :name: :resizing
+      :value: 3
+    - :name: :activated
+      :value: 4
+    - :name: :tiled_left
+      :value: 5
+    - :name: :tiled_right
+      :value: 6
+    - :name: :tiled_top
+      :value: 7
+    - :name: :tiled_bottom
+      :value: 8
+    - :name: :suspended
+      :value: 9
+  - :name: :wm_capabilities
+    :entries:
+    - :name: :window_menu
+      :value: 1
+    - :name: :maximize
+      :value: 2
+    - :name: :fullscreen
+      :value: 3
+    - :name: :minimize
+      :value: 4
+:xdg_popup:
+  :version: 6
+  :requests:
+    :destroy:
+      :opcode: 0
+      :args: []
+    :grab:
+      :opcode: 1
+      :args:
+      - :name: :seat
+        :type: :object
+        :interface: :wl_seat
+      - :name: :serial
+        :type: :uint
+    :reposition:
+      :opcode: 2
+      :args:
+      - :name: :positioner
+        :type: :object
+        :interface: :xdg_positioner
+      - :name: :token
+        :type: :uint
+  :events:
+  - :opcode: 0
+    :name: :configure
+    :args:
+    - :name: :x
+      :type: :int
+    - :name: :y
+      :type: :int
+    - :name: :width
+      :type: :int
+    - :name: :height
+      :type: :int
+  - :opcode: 1
+    :name: :popup_done
+    :args: []
+  - :opcode: 2
+    :name: :repositioned
+    :args:
+    - :name: :token
+      :type: :uint
+    :since: 3
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :invalid_grab
+      :value: 0

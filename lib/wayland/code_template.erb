@@ -1,0 +1,91 @@
+module Wayland::<%= mod_name %>
+  class <%= class_name %> < Wayland::WLObject
+    VERSION = <%= ispec[:version] %>
+% ispec[:requests].each do |name, rspec|
+%   opcode = rspec[:opcode]
+%   f_anc = false
+%   f_new = false
+%   message_size = 0
+%   astring = args_string rspec[:args]
+    def <%= name %>(<%= astring %>)
+      _alist = [wl_object_id, 0]
+      _size = 0x<%= message_base_size(rspec[:args]).to_s(16) %>
+%   pack_template = "LL"
+%   rspec[:args].each_with_index do |arg, i|
+%     type = arg[:type]
+%     name = arg[:name]
+%     pack_template << pack_template_char(type)
+%     case type
+%     when :string, :array
+%       if arg_check
+      check_<%= type %>(<%= name %>) || raise(ArgumentError, "invalid argument #<%= i %>")
+%       end
+      _str = pad_<%= type %> <%= name %>
+      _str_size = _str.bytesize
+      _size += (_str_size + 4) << 16
+      _alist << _str_size
+      _alist << _str
+%     when :new_id
+%       f_new = true
+%       interface = arg[:interface]
+%       if interface
+      _obj = @display.create_object :<%= interface %>, nil, as
+%       else
+      _obj = @display.create_object <%= name %>, nil, as
+%       end
+      _alist << _obj.wl_object_id
+%     when :fd
+%       f_anc = true
+      _ancdata = Socket::AncillaryData.int(:UNIX, :SOCKET, :RIGHTS, <%= name %>)
+%     when :object
+      _alist << <%= name %>.wl_object_id
+%     when :fixed
+%       if arg_check
+      check_fixed(<%= name %>) || raise(ArgumentError, "invalid argument #<%= i %>")
+%       end
+      _alist << (<%= name %> * (2 ** 8)).to_i
+%     else
+%       if arg_check
+      check_<%= type %>(<%= name %>) || raise(ArgumentError, "invalid argument #<%= i %>")
+%       end
+      _alist << <%= name %>
+%     end # case type
+%   end
+      _alist[1] = <%= opcode %> | _size
+      _message = _alist.pack "<%= pack_template %>"
+% if f_anc
+      @display.sendmsg _message, _ancdata
+% else
+      @display.sendmsg _message
+% end
+% if astring.empty?
+      @display.request_log self, __callee__
+% else
+      @display.request_log self, __callee__, *_alist
+% end
+% if f_new
+      return _obj
+% else
+      return nil
+% end
+    end
+
+% end # ispec[:requests].each
+% if ispec[:enums].size > 0
+    @__enums = {}
+%   ispec[:enums].each do |e|
+%   n = e[:name]
+%   names = e[:entries].map {|ent| ":\"" + ent[:name].to_s + "\"" }.join(", ")
+%   values = e[:entries].map {|ent| ent[:value] }.join(", ")
+    @__enums[:<%= n %>] = Struct.new(<%= names %>).new(<%= values %>).freeze
+%   end
+    @__enums.freeze
+    def self.[](n); @__enums[n] end
+% end
+
+    # ifname
+    def ifname; :<%= ifname %> end
+
+  end
+end
+

@@ -1,0 +1,1411 @@
+---
+:wl_display:
+  :version: 1
+  :requests:
+    :sync:
+      :opcode: 0
+      :args:
+      - :name: :callback
+        :type: :new_id
+        :interface: :wl_callback
+    :get_registry:
+      :opcode: 1
+      :args:
+      - :name: :registry
+        :type: :new_id
+        :interface: :wl_registry
+  :events:
+  - :opcode: 0
+    :name: :error
+    :args:
+    - :name: :object_id
+      :type: :object
+    - :name: :code
+      :type: :uint
+    - :name: :message
+      :type: :string
+  - :opcode: 1
+    :name: :delete_id
+    :args:
+    - :name: :id
+      :type: :uint
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :invalid_object
+      :value: 0
+    - :name: :invalid_method
+      :value: 1
+    - :name: :no_memory
+      :value: 2
+    - :name: :implementation
+      :value: 3
+:wl_registry:
+  :version: 1
+  :requests:
+    :bind:
+      :opcode: 0
+      :args:
+      - :name: :name
+        :type: :uint
+      - :name: :interface
+        :type: :string
+      - :name: :version
+        :type: :uint
+      - :name: :id
+        :type: :new_id
+  :events:
+  - :opcode: 0
+    :name: :global
+    :args:
+    - :name: :name
+      :type: :uint
+    - :name: :interface
+      :type: :string
+    - :name: :version
+      :type: :uint
+  - :opcode: 1
+    :name: :global_remove
+    :args:
+    - :name: :name
+      :type: :uint
+  :enums: []
+:wl_callback:
+  :version: 1
+  :requests: {}
+  :events:
+  - :opcode: 0
+    :name: :done
+    :args:
+    - :name: :callback_data
+      :type: :uint
+  :enums: []
+:wl_compositor:
+  :version: 5
+  :requests:
+    :create_surface:
+      :opcode: 0
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :wl_surface
+    :create_region:
+      :opcode: 1
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :wl_region
+  :events: []
+  :enums: []
+:wl_shm_pool:
+  :version: 1
+  :requests:
+    :create_buffer:
+      :opcode: 0
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :wl_buffer
+      - :name: :offset
+        :type: :int
+      - :name: :width
+        :type: :int
+      - :name: :height
+        :type: :int
+      - :name: :stride
+        :type: :int
+      - :name: :format
+        :type: :uint
+        :enum: :wl_shm.format
+    :destroy:
+      :opcode: 1
+      :args: []
+    :resize:
+      :opcode: 2
+      :args:
+      - :name: :size
+        :type: :int
+  :events: []
+  :enums: []
+:wl_shm:
+  :version: 1
+  :requests:
+    :create_pool:
+      :opcode: 0
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :wl_shm_pool
+      - :name: :fd
+        :type: :fd
+      - :name: :size
+        :type: :int
+  :events:
+  - :opcode: 0
+    :name: :format
+    :args:
+    - :name: :format
+      :type: :uint
+      :enum: :format
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :invalid_format
+      :value: 0
+    - :name: :invalid_stride
+      :value: 1
+    - :name: :invalid_fd
+      :value: 2
+  - :name: :format
+    :entries:
+    - :name: :argb8888
+      :value: 0
+    - :name: :xrgb8888
+      :value: 1
+    - :name: :c8
+      :value: 538982467
+    - :name: :rgb332
+      :value: 943867730
+    - :name: :bgr233
+      :value: 944916290
+    - :name: :xrgb4444
+      :value: 842093144
+    - :name: :xbgr4444
+      :value: 842089048
+    - :name: :rgbx4444
+      :value: 842094674
+    - :name: :bgrx4444
+      :value: 842094658
+    - :name: :argb4444
+      :value: 842093121
+    - :name: :abgr4444
+      :value: 842089025
+    - :name: :rgba4444
+      :value: 842088786
+    - :name: :bgra4444
+      :value: 842088770
+    - :name: :xrgb1555
+      :value: 892424792
+    - :name: :xbgr1555
+      :value: 892420696
+    - :name: :rgbx5551
+      :value: 892426322
+    - :name: :bgrx5551
+      :value: 892426306
+    - :name: :argb1555
+      :value: 892424769
+    - :name: :abgr1555
+      :value: 892420673
+    - :name: :rgba5551
+      :value: 892420434
+    - :name: :bgra5551
+      :value: 892420418
+    - :name: :rgb565
+      :value: 909199186
+    - :name: :bgr565
+      :value: 909199170
+    - :name: :rgb888
+      :value: 875710290
+    - :name: :bgr888
+      :value: 875710274
+    - :name: :xbgr8888
+      :value: 875709016
+    - :name: :rgbx8888
+      :value: 875714642
+    - :name: :bgrx8888
+      :value: 875714626
+    - :name: :abgr8888
+      :value: 875708993
+    - :name: :rgba8888
+      :value: 875708754
+    - :name: :bgra8888
+      :value: 875708738
+    - :name: :xrgb2101010
+      :value: 808669784
+    - :name: :xbgr2101010
+      :value: 808665688
+    - :name: :rgbx1010102
+      :value: 808671314
+    - :name: :bgrx1010102
+      :value: 808671298
+    - :name: :argb2101010
+      :value: 808669761
+    - :name: :abgr2101010
+      :value: 808665665
+    - :name: :rgba1010102
+      :value: 808665426
+    - :name: :bgra1010102
+      :value: 808665410
+    - :name: :yuyv
+      :value: 1448695129
+    - :name: :yvyu
+      :value: 1431918169
+    - :name: :uyvy
+      :value: 1498831189
+    - :name: :vyuy
+      :value: 1498765654
+    - :name: :ayuv
+      :value: 1448433985
+    - :name: :nv12
+      :value: 842094158
+    - :name: :nv21
+      :value: 825382478
+    - :name: :nv16
+      :value: 909203022
+    - :name: :nv61
+      :value: 825644622
+    - :name: :yuv410
+      :value: 961959257
+    - :name: :yvu410
+      :value: 961893977
+    - :name: :yuv411
+      :value: 825316697
+    - :name: :yvu411
+      :value: 825316953
+    - :name: :yuv420
+      :value: 842093913
+    - :name: :yvu420
+      :value: 842094169
+    - :name: :yuv422
+      :value: 909202777
+    - :name: :yvu422
+      :value: 909203033
+    - :name: :yuv444
+      :value: 875713881
+    - :name: :yvu444
+      :value: 875714137
+    - :name: :r8
+      :value: 538982482
+    - :name: :r16
+      :value: 540422482
+    - :name: :rg88
+      :value: 943212370
+    - :name: :gr88
+      :value: 943215175
+    - :name: :rg1616
+      :value: 842221394
+    - :name: :gr1616
+      :value: 842224199
+    - :name: :xrgb16161616f
+      :value: 1211388504
+    - :name: :xbgr16161616f
+      :value: 1211384408
+    - :name: :argb16161616f
+      :value: 1211388481
+    - :name: :abgr16161616f
+      :value: 1211384385
+    - :name: :xyuv8888
+      :value: 1448434008
+    - :name: :vuy888
+      :value: 875713878
+    - :name: :vuy101010
+      :value: 808670550
+    - :name: :y210
+      :value: 808530521
+    - :name: :y212
+      :value: 842084953
+    - :name: :y216
+      :value: 909193817
+    - :name: :y410
+      :value: 808531033
+    - :name: :y412
+      :value: 842085465
+    - :name: :y416
+      :value: 909194329
+    - :name: :xvyu2101010
+      :value: 808670808
+    - :name: :xvyu12_16161616
+      :value: 909334104
+    - :name: :xvyu16161616
+      :value: 942954072
+    - :name: :y0l0
+      :value: 810299481
+    - :name: :x0l0
+      :value: 810299480
+    - :name: :y0l2
+      :value: 843853913
+    - :name: :x0l2
+      :value: 843853912
+    - :name: :yuv420_8bit
+      :value: 942691673
+    - :name: :yuv420_10bit
+      :value: 808539481
+    - :name: :xrgb8888_a8
+      :value: 943805016
+    - :name: :xbgr8888_a8
+      :value: 943800920
+    - :name: :rgbx8888_a8
+      :value: 943806546
+    - :name: :bgrx8888_a8
+      :value: 943806530
+    - :name: :rgb888_a8
+      :value: 943798354
+    - :name: :bgr888_a8
+      :value: 943798338
+    - :name: :rgb565_a8
+      :value: 943797586
+    - :name: :bgr565_a8
+      :value: 943797570
+    - :name: :nv24
+      :value: 875714126
+    - :name: :nv42
+      :value: 842290766
+    - :name: :p210
+      :value: 808530512
+    - :name: :p010
+      :value: 808530000
+    - :name: :p012
+      :value: 842084432
+    - :name: :p016
+      :value: 909193296
+    - :name: :axbxgxrx106106106106
+      :value: 808534593
+    - :name: :nv15
+      :value: 892425806
+    - :name: :q410
+      :value: 808531025
+    - :name: :q401
+      :value: 825242705
+    - :name: :xrgb16161616
+      :value: 942953048
+    - :name: :xbgr16161616
+      :value: 942948952
+    - :name: :argb16161616
+      :value: 942953025
+    - :name: :abgr16161616
+      :value: 942948929
+:wl_buffer:
+  :version: 1
+  :requests:
+    :destroy:
+      :opcode: 0
+      :args: []
+  :events:
+  - :opcode: 0
+    :name: :release
+    :args: []
+  :enums: []
+:wl_data_offer:
+  :version: 3
+  :requests:
+    :accept:
+      :opcode: 0
+      :args:
+      - :name: :serial
+        :type: :uint
+      - :name: :mime_type
+        :type: :string
+        :allow_null: true
+    :receive:
+      :opcode: 1
+      :args:
+      - :name: :mime_type
+        :type: :string
+      - :name: :fd
+        :type: :fd
+    :destroy:
+      :opcode: 2
+      :args: []
+    :finish:
+      :opcode: 3
+      :args: []
+    :set_actions:
+      :opcode: 4
+      :args:
+      - :name: :dnd_actions
+        :type: :uint
+        :enum: :wl_data_device_manager.dnd_action
+      - :name: :preferred_action
+        :type: :uint
+        :enum: :wl_data_device_manager.dnd_action
+  :events:
+  - :opcode: 0
+    :name: :offer
+    :args:
+    - :name: :mime_type
+      :type: :string
+  - :opcode: 1
+    :name: :source_actions
+    :args:
+    - :name: :source_actions
+      :type: :uint
+      :enum: :wl_data_device_manager.dnd_action
+    :since: 3
+  - :opcode: 2
+    :name: :action
+    :args:
+    - :name: :dnd_action
+      :type: :uint
+      :enum: :wl_data_device_manager.dnd_action
+    :since: 3
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :invalid_finish
+      :value: 0
+    - :name: :invalid_action_mask
+      :value: 1
+    - :name: :invalid_action
+      :value: 2
+    - :name: :invalid_offer
+      :value: 3
+:wl_data_source:
+  :version: 3
+  :requests:
+    :offer:
+      :opcode: 0
+      :args:
+      - :name: :mime_type
+        :type: :string
+    :destroy:
+      :opcode: 1
+      :args: []
+    :set_actions:
+      :opcode: 2
+      :args:
+      - :name: :dnd_actions
+        :type: :uint
+        :enum: :wl_data_device_manager.dnd_action
+  :events:
+  - :opcode: 0
+    :name: :target
+    :args:
+    - :name: :mime_type
+      :type: :string
+      :allow_null: true
+  - :opcode: 1
+    :name: :send
+    :args:
+    - :name: :mime_type
+      :type: :string
+    - :name: :fd
+      :type: :fd
+  - :opcode: 2
+    :name: :cancelled
+    :args: []
+  - :opcode: 3
+    :name: :dnd_drop_performed
+    :args: []
+    :since: 3
+  - :opcode: 4
+    :name: :dnd_finished
+    :args: []
+    :since: 3
+  - :opcode: 5
+    :name: :action
+    :args:
+    - :name: :dnd_action
+      :type: :uint
+      :enum: :wl_data_device_manager.dnd_action
+    :since: 3
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :invalid_action_mask
+      :value: 0
+    - :name: :invalid_source
+      :value: 1
+:wl_data_device:
+  :version: 3
+  :requests:
+    :start_drag:
+      :opcode: 0
+      :args:
+      - :name: :source
+        :type: :object
+        :interface: :wl_data_source
+        :allow_null: true
+      - :name: :origin
+        :type: :object
+        :interface: :wl_surface
+      - :name: :icon
+        :type: :object
+        :interface: :wl_surface
+        :allow_null: true
+      - :name: :serial
+        :type: :uint
+    :set_selection:
+      :opcode: 1
+      :args:
+      - :name: :source
+        :type: :object
+        :interface: :wl_data_source
+        :allow_null: true
+      - :name: :serial
+        :type: :uint
+    :release:
+      :opcode: 2
+      :args: []
+  :events:
+  - :opcode: 0
+    :name: :data_offer
+    :args:
+    - :name: :id
+      :type: :new_id
+      :interface: :wl_data_offer
+  - :opcode: 1
+    :name: :enter
+    :args:
+    - :name: :serial
+      :type: :uint
+    - :name: :surface
+      :type: :object
+      :interface: :wl_surface
+    - :name: :x
+      :type: :fixed
+    - :name: :y
+      :type: :fixed
+    - :name: :id
+      :type: :object
+      :interface: :wl_data_offer
+      :allow_null: true
+  - :opcode: 2
+    :name: :leave
+    :args: []
+  - :opcode: 3
+    :name: :motion
+    :args:
+    - :name: :time
+      :type: :uint
+    - :name: :x
+      :type: :fixed
+    - :name: :y
+      :type: :fixed
+  - :opcode: 4
+    :name: :drop
+    :args: []
+  - :opcode: 5
+    :name: :selection
+    :args:
+    - :name: :id
+      :type: :object
+      :interface: :wl_data_offer
+      :allow_null: true
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :role
+      :value: 0
+:wl_data_device_manager:
+  :version: 3
+  :requests:
+    :create_data_source:
+      :opcode: 0
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :wl_data_source
+    :get_data_device:
+      :opcode: 1
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :wl_data_device
+      - :name: :seat
+        :type: :object
+        :interface: :wl_seat
+  :events: []
+  :enums:
+  - :name: :dnd_action
+    :entries:
+    - :name: :none
+      :value: 0
+    - :name: :copy
+      :value: 1
+    - :name: :move
+      :value: 2
+    - :name: :ask
+      :value: 4
+:wl_shell:
+  :version: 1
+  :requests:
+    :get_shell_surface:
+      :opcode: 0
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :wl_shell_surface
+      - :name: :surface
+        :type: :object
+        :interface: :wl_surface
+  :events: []
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :role
+      :value: 0
+:wl_shell_surface:
+  :version: 1
+  :requests:
+    :pong:
+      :opcode: 0
+      :args:
+      - :name: :serial
+        :type: :uint
+    :move:
+      :opcode: 1
+      :args:
+      - :name: :seat
+        :type: :object
+        :interface: :wl_seat
+      - :name: :serial
+        :type: :uint
+    :resize:
+      :opcode: 2
+      :args:
+      - :name: :seat
+        :type: :object
+        :interface: :wl_seat
+      - :name: :serial
+        :type: :uint
+      - :name: :edges
+        :type: :uint
+        :enum: :resize
+    :set_toplevel:
+      :opcode: 3
+      :args: []
+    :set_transient:
+      :opcode: 4
+      :args:
+      - :name: :parent
+        :type: :object
+        :interface: :wl_surface
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+      - :name: :flags
+        :type: :uint
+        :enum: :transient
+    :set_fullscreen:
+      :opcode: 5
+      :args:
+      - :name: :method
+        :type: :uint
+        :enum: :fullscreen_method
+      - :name: :framerate
+        :type: :uint
+      - :name: :output
+        :type: :object
+        :interface: :wl_output
+        :allow_null: true
+    :set_popup:
+      :opcode: 6
+      :args:
+      - :name: :seat
+        :type: :object
+        :interface: :wl_seat
+      - :name: :serial
+        :type: :uint
+      - :name: :parent
+        :type: :object
+        :interface: :wl_surface
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+      - :name: :flags
+        :type: :uint
+        :enum: :transient
+    :set_maximized:
+      :opcode: 7
+      :args:
+      - :name: :output
+        :type: :object
+        :interface: :wl_output
+        :allow_null: true
+    :set_title:
+      :opcode: 8
+      :args:
+      - :name: :title
+        :type: :string
+    :set_class:
+      :opcode: 9
+      :args:
+      - :name: :class_
+        :type: :string
+  :events:
+  - :opcode: 0
+    :name: :ping
+    :args:
+    - :name: :serial
+      :type: :uint
+  - :opcode: 1
+    :name: :configure
+    :args:
+    - :name: :edges
+      :type: :uint
+      :enum: :resize
+    - :name: :width
+      :type: :int
+    - :name: :height
+      :type: :int
+  - :opcode: 2
+    :name: :popup_done
+    :args: []
+  :enums:
+  - :name: :resize
+    :entries:
+    - :name: :none
+      :value: 0
+    - :name: :top
+      :value: 1
+    - :name: :bottom
+      :value: 2
+    - :name: :left
+      :value: 4
+    - :name: :top_left
+      :value: 5
+    - :name: :bottom_left
+      :value: 6
+    - :name: :right
+      :value: 8
+    - :name: :top_right
+      :value: 9
+    - :name: :bottom_right
+      :value: 10
+  - :name: :transient
+    :entries:
+    - :name: :inactive
+      :value: 1
+  - :name: :fullscreen_method
+    :entries:
+    - :name: :default
+      :value: 0
+    - :name: :scale
+      :value: 1
+    - :name: :driver
+      :value: 2
+    - :name: :fill
+      :value: 3
+:wl_surface:
+  :version: 5
+  :requests:
+    :destroy:
+      :opcode: 0
+      :args: []
+    :attach:
+      :opcode: 1
+      :args:
+      - :name: :buffer
+        :type: :object
+        :interface: :wl_buffer
+        :allow_null: true
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+    :damage:
+      :opcode: 2
+      :args:
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+      - :name: :width
+        :type: :int
+      - :name: :height
+        :type: :int
+    :frame:
+      :opcode: 3
+      :args:
+      - :name: :callback
+        :type: :new_id
+        :interface: :wl_callback
+    :set_opaque_region:
+      :opcode: 4
+      :args:
+      - :name: :region
+        :type: :object
+        :interface: :wl_region
+        :allow_null: true
+    :set_input_region:
+      :opcode: 5
+      :args:
+      - :name: :region
+        :type: :object
+        :interface: :wl_region
+        :allow_null: true
+    :commit:
+      :opcode: 6
+      :args: []
+    :set_buffer_transform:
+      :opcode: 7
+      :args:
+      - :name: :transform
+        :type: :int
+        :enum: :wl_output.transform
+    :set_buffer_scale:
+      :opcode: 8
+      :args:
+      - :name: :scale
+        :type: :int
+    :damage_buffer:
+      :opcode: 9
+      :args:
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+      - :name: :width
+        :type: :int
+      - :name: :height
+        :type: :int
+    :offset:
+      :opcode: 10
+      :args:
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+  :events:
+  - :opcode: 0
+    :name: :enter
+    :args:
+    - :name: :output
+      :type: :object
+      :interface: :wl_output
+  - :opcode: 1
+    :name: :leave
+    :args:
+    - :name: :output
+      :type: :object
+      :interface: :wl_output
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :invalid_scale
+      :value: 0
+    - :name: :invalid_transform
+      :value: 1
+    - :name: :invalid_size
+      :value: 2
+    - :name: :invalid_offset
+      :value: 3
+:wl_seat:
+  :version: 8
+  :requests:
+    :get_pointer:
+      :opcode: 0
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :wl_pointer
+    :get_keyboard:
+      :opcode: 1
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :wl_keyboard
+    :get_touch:
+      :opcode: 2
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :wl_touch
+    :release:
+      :opcode: 3
+      :args: []
+  :events:
+  - :opcode: 0
+    :name: :capabilities
+    :args:
+    - :name: :capabilities
+      :type: :uint
+      :enum: :capability
+  - :opcode: 1
+    :name: :name
+    :args:
+    - :name: :name
+      :type: :string
+    :since: 2
+  :enums:
+  - :name: :capability
+    :entries:
+    - :name: :pointer
+      :value: 1
+    - :name: :keyboard
+      :value: 2
+    - :name: :touch
+      :value: 4
+  - :name: :error
+    :entries:
+    - :name: :missing_capability
+      :value: 0
+:wl_pointer:
+  :version: 8
+  :requests:
+    :set_cursor:
+      :opcode: 0
+      :args:
+      - :name: :serial
+        :type: :uint
+      - :name: :surface
+        :type: :object
+        :interface: :wl_surface
+        :allow_null: true
+      - :name: :hotspot_x
+        :type: :int
+      - :name: :hotspot_y
+        :type: :int
+    :release:
+      :opcode: 1
+      :args: []
+  :events:
+  - :opcode: 0
+    :name: :enter
+    :args:
+    - :name: :serial
+      :type: :uint
+    - :name: :surface
+      :type: :object
+      :interface: :wl_surface
+    - :name: :surface_x
+      :type: :fixed
+    - :name: :surface_y
+      :type: :fixed
+  - :opcode: 1
+    :name: :leave
+    :args:
+    - :name: :serial
+      :type: :uint
+    - :name: :surface
+      :type: :object
+      :interface: :wl_surface
+  - :opcode: 2
+    :name: :motion
+    :args:
+    - :name: :time
+      :type: :uint
+    - :name: :surface_x
+      :type: :fixed
+    - :name: :surface_y
+      :type: :fixed
+  - :opcode: 3
+    :name: :button
+    :args:
+    - :name: :serial
+      :type: :uint
+    - :name: :time
+      :type: :uint
+    - :name: :button
+      :type: :uint
+    - :name: :state
+      :type: :uint
+      :enum: :button_state
+  - :opcode: 4
+    :name: :axis
+    :args:
+    - :name: :time
+      :type: :uint
+    - :name: :axis
+      :type: :uint
+      :enum: :axis
+    - :name: :value
+      :type: :fixed
+  - :opcode: 5
+    :name: :frame
+    :args: []
+    :since: 5
+  - :opcode: 6
+    :name: :axis_source
+    :args:
+    - :name: :axis_source
+      :type: :uint
+      :enum: :axis_source
+    :since: 5
+  - :opcode: 7
+    :name: :axis_stop
+    :args:
+    - :name: :time
+      :type: :uint
+    - :name: :axis
+      :type: :uint
+      :enum: :axis
+    :since: 5
+  - :opcode: 8
+    :name: :axis_discrete
+    :args:
+    - :name: :axis
+      :type: :uint
+      :enum: :axis
+    - :name: :discrete
+      :type: :int
+    :since: 5
+  - :opcode: 9
+    :name: :axis_value120
+    :args:
+    - :name: :axis
+      :type: :uint
+      :enum: :axis
+    - :name: :value120
+      :type: :int
+    :since: 8
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :role
+      :value: 0
+  - :name: :button_state
+    :entries:
+    - :name: :released
+      :value: 0
+    - :name: :pressed
+      :value: 1
+  - :name: :axis
+    :entries:
+    - :name: :vertical_scroll
+      :value: 0
+    - :name: :horizontal_scroll
+      :value: 1
+  - :name: :axis_source
+    :entries:
+    - :name: :wheel
+      :value: 0
+    - :name: :finger
+      :value: 1
+    - :name: :continuous
+      :value: 2
+    - :name: :wheel_tilt
+      :value: 3
+:wl_keyboard:
+  :version: 8
+  :requests:
+    :release:
+      :opcode: 0
+      :args: []
+  :events:
+  - :opcode: 0
+    :name: :keymap
+    :args:
+    - :name: :format
+      :type: :uint
+      :enum: :keymap_format
+    - :name: :fd
+      :type: :fd
+    - :name: :size
+      :type: :uint
+  - :opcode: 1
+    :name: :enter
+    :args:
+    - :name: :serial
+      :type: :uint
+    - :name: :surface
+      :type: :object
+      :interface: :wl_surface
+    - :name: :keys
+      :type: :array
+  - :opcode: 2
+    :name: :leave
+    :args:
+    - :name: :serial
+      :type: :uint
+    - :name: :surface
+      :type: :object
+      :interface: :wl_surface
+  - :opcode: 3
+    :name: :key
+    :args:
+    - :name: :serial
+      :type: :uint
+    - :name: :time
+      :type: :uint
+    - :name: :key
+      :type: :uint
+    - :name: :state
+      :type: :uint
+      :enum: :key_state
+  - :opcode: 4
+    :name: :modifiers
+    :args:
+    - :name: :serial
+      :type: :uint
+    - :name: :mods_depressed
+      :type: :uint
+    - :name: :mods_latched
+      :type: :uint
+    - :name: :mods_locked
+      :type: :uint
+    - :name: :group
+      :type: :uint
+  - :opcode: 5
+    :name: :repeat_info
+    :args:
+    - :name: :rate
+      :type: :int
+    - :name: :delay
+      :type: :int
+    :since: 4
+  :enums:
+  - :name: :keymap_format
+    :entries:
+    - :name: :no_keymap
+      :value: 0
+    - :name: :xkb_v1
+      :value: 1
+  - :name: :key_state
+    :entries:
+    - :name: :released
+      :value: 0
+    - :name: :pressed
+      :value: 1
+:wl_touch:
+  :version: 8
+  :requests:
+    :release:
+      :opcode: 0
+      :args: []
+  :events:
+  - :opcode: 0
+    :name: :down
+    :args:
+    - :name: :serial
+      :type: :uint
+    - :name: :time
+      :type: :uint
+    - :name: :surface
+      :type: :object
+      :interface: :wl_surface
+    - :name: :id
+      :type: :int
+    - :name: :x
+      :type: :fixed
+    - :name: :y
+      :type: :fixed
+  - :opcode: 1
+    :name: :up
+    :args:
+    - :name: :serial
+      :type: :uint
+    - :name: :time
+      :type: :uint
+    - :name: :id
+      :type: :int
+  - :opcode: 2
+    :name: :motion
+    :args:
+    - :name: :time
+      :type: :uint
+    - :name: :id
+      :type: :int
+    - :name: :x
+      :type: :fixed
+    - :name: :y
+      :type: :fixed
+  - :opcode: 3
+    :name: :frame
+    :args: []
+  - :opcode: 4
+    :name: :cancel
+    :args: []
+  - :opcode: 5
+    :name: :shape
+    :args:
+    - :name: :id
+      :type: :int
+    - :name: :major
+      :type: :fixed
+    - :name: :minor
+      :type: :fixed
+    :since: 6
+  - :opcode: 6
+    :name: :orientation
+    :args:
+    - :name: :id
+      :type: :int
+    - :name: :orientation
+      :type: :fixed
+    :since: 6
+  :enums: []
+:wl_output:
+  :version: 4
+  :requests:
+    :release:
+      :opcode: 0
+      :args: []
+  :events:
+  - :opcode: 0
+    :name: :geometry
+    :args:
+    - :name: :x
+      :type: :int
+    - :name: :y
+      :type: :int
+    - :name: :physical_width
+      :type: :int
+    - :name: :physical_height
+      :type: :int
+    - :name: :subpixel
+      :type: :int
+      :enum: :subpixel
+    - :name: :make
+      :type: :string
+    - :name: :model
+      :type: :string
+    - :name: :transform
+      :type: :int
+      :enum: :transform
+  - :opcode: 1
+    :name: :mode
+    :args:
+    - :name: :flags
+      :type: :uint
+      :enum: :mode
+    - :name: :width
+      :type: :int
+    - :name: :height
+      :type: :int
+    - :name: :refresh
+      :type: :int
+  - :opcode: 2
+    :name: :done
+    :args: []
+    :since: 2
+  - :opcode: 3
+    :name: :scale
+    :args:
+    - :name: :factor
+      :type: :int
+    :since: 2
+  - :opcode: 4
+    :name: :name
+    :args:
+    - :name: :name
+      :type: :string
+    :since: 4
+  - :opcode: 5
+    :name: :description
+    :args:
+    - :name: :description
+      :type: :string
+    :since: 4
+  :enums:
+  - :name: :subpixel
+    :entries:
+    - :name: :unknown
+      :value: 0
+    - :name: :none
+      :value: 1
+    - :name: :horizontal_rgb
+      :value: 2
+    - :name: :horizontal_bgr
+      :value: 3
+    - :name: :vertical_rgb
+      :value: 4
+    - :name: :vertical_bgr
+      :value: 5
+  - :name: :transform
+    :entries:
+    - :name: :normal
+      :value: 0
+    - :name: :90
+      :value: 1
+    - :name: :180
+      :value: 2
+    - :name: :270
+      :value: 3
+    - :name: :flipped
+      :value: 4
+    - :name: :flipped_90
+      :value: 5
+    - :name: :flipped_180
+      :value: 6
+    - :name: :flipped_270
+      :value: 7
+  - :name: :mode
+    :entries:
+    - :name: :current
+      :value: 1
+    - :name: :preferred
+      :value: 2
+:wl_region:
+  :version: 1
+  :requests:
+    :destroy:
+      :opcode: 0
+      :args: []
+    :add:
+      :opcode: 1
+      :args:
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+      - :name: :width
+        :type: :int
+      - :name: :height
+        :type: :int
+    :subtract:
+      :opcode: 2
+      :args:
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+      - :name: :width
+        :type: :int
+      - :name: :height
+        :type: :int
+  :events: []
+  :enums: []
+:wl_subcompositor:
+  :version: 1
+  :requests:
+    :destroy:
+      :opcode: 0
+      :args: []
+    :get_subsurface:
+      :opcode: 1
+      :args:
+      - :name: :id
+        :type: :new_id
+        :interface: :wl_subsurface
+      - :name: :surface
+        :type: :object
+        :interface: :wl_surface
+      - :name: :parent
+        :type: :object
+        :interface: :wl_surface
+  :events: []
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :bad_surface
+      :value: 0
+:wl_subsurface:
+  :version: 1
+  :requests:
+    :destroy:
+      :opcode: 0
+      :args: []
+    :set_position:
+      :opcode: 1
+      :args:
+      - :name: :x
+        :type: :int
+      - :name: :y
+        :type: :int
+    :place_above:
+      :opcode: 2
+      :args:
+      - :name: :sibling
+        :type: :object
+        :interface: :wl_surface
+    :place_below:
+      :opcode: 3
+      :args:
+      - :name: :sibling
+        :type: :object
+        :interface: :wl_surface
+    :set_sync:
+      :opcode: 4
+      :args: []
+    :set_desync:
+      :opcode: 5
+      :args: []
+  :events: []
+  :enums:
+  - :name: :error
+    :entries:
+    - :name: :bad_surface
+      :value: 0
