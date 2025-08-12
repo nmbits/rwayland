@@ -10,19 +10,20 @@ Ruby bindings for Wayland protocol.
 
 ## Dependencies
 
-* None.
+* Ruby >= 3.3
 
 ## Recommendations
 
 * rcairo
 * pango
-* xkb
 
 ## Installation
 
 ### RubyGems
 
-Comming soon.
+```
+$ gem install rwayland
+```
 
 ## Documents
 
