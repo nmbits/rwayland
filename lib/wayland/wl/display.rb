@@ -24,13 +24,11 @@ module Wayland
         loop do
           if IO.select(rd, [], [], timeout)
             str, addr, int, *ctls = @socket.recvmsg(256, 0, nil, :scm_rights => true)
-            # Wayland.logger.debug "recvmsg: #{str.bytesize} byte"
             ctls.each do |a|
               if a.cmsg_is?(:SOCKET, :RIGHTS)
                 a.unix_rights.each{|io| ios << io }
               end
             end
-            raise "SequenceError" if ios.size > 1
             count = @dispatcher.feed str, ios
             ios.clear
           end
