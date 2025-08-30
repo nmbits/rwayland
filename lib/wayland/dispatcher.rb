@@ -4,6 +4,7 @@ require 'wayland/message_buffer'
 
 module Wayland
   class Dispatcher
+    GUARD = Object.new.freeze
     def initialize(wl_display)
       @phase = :header
       @buffer = MessageBuffer.new
@@ -69,7 +70,7 @@ module Wayland
           @ios.shift || raise("no io for fd arg")
         end
       end
-      f = object.respond_to? name
+      f = object.respond_to?(name) && !GUARD.respond_to?(name)
       @display.event_log f, oid, object.ifname, name, *args
       object.__send__ name, *args if f
     end
