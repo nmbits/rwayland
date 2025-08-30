@@ -27,8 +27,8 @@ module RWaylandTk
       end
 
       def configure(serial)
-        @window._configure serial
         ack_configure serial
+        @window._configure serial
       end
     end
 
@@ -102,16 +102,20 @@ module RWaylandTk
 
     module WlKeyboard
       def keymap(fmt, fd, size)
-        if fmt != Wayland::Wl::Keyboard[:keymap_format].xkb_v1
-          raise "unknonw keymap format received"
+        case fmt
+        when Wayland::Wl::Keyboard[:keymap_format].no_keymap
+          fd.close
+        when Wayland::Wl::Keyboard[:keymap_format].xkb_v1
+          shm = Wayland::SharedMemory.new fd, size: size, prot: Wayland::SharedMemory::PROT_READ
+          @xkb_ctx = Wayland::Xkb::Context.new
+          @xkb_keymap = @xkb_ctx.keymap_new_from_string(shm.address,
+                                                        Wayland::XkbSupport::XKB_KEYMAP_FORMAT_TEXT_V1,
+                                                        Wayland::XkbSupport::XKB_KEYMAP_COMPILE_NO_FLAGS)
+          @xkb_state = @xkb_keymap.state_new
+          shm.close
+        else
+          raise "unknonw keymap format received #{fmt}"
         end
-        shm = Wayland::SharedMemory.new fd, size: size, prot: Wayland::SharedMemory::PROT_READ
-        @xkb_ctx = Wayland::Xkb::Context.new
-        @xkb_keymap = @xkb_ctx.keymap_new_from_string(shm.address,
-                                                      Wayland::XkbSupport::XKB_KEYMAP_FORMAT_TEXT_V1,
-                                                      Wayland::XkbSupport::XKB_KEYMAP_COMPILE_NO_FLAGS)
-        @xkb_state = @xkb_keymap.state_new
-        shm.close
       end
 
       def enter(serial, surface, keys)
@@ -157,7 +161,8 @@ module RWaylandTk
     module WlRegistry
       def global(name, interface, version)
         if interface == "wl_seat"
-          bind name, interface, version, :wl_seat, as: WlSeat
+          intf = Wayland::Protocol[:wl_seat]
+          bind name, interface, [version, intf[:version]].min, :wl_seat, as: WlSeat
         else
           super
         end

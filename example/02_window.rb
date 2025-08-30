@@ -23,6 +23,7 @@ class MyApplicationWindow < RWaylandTk::ToplevelWindow
   end
 
   def mouse_down(button, time, serial)
+    return unless @py
     seat = @display[:wl_seat]
     if @py < TITLE_BAR_SIZE
       @xdg_toplevel.move(seat, serial)

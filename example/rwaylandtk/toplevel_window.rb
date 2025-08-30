@@ -99,6 +99,10 @@ module RWaylandTk
     end
 
     def _configure(serial)
+      p :_configure
+      realloc_buffer
+      draw
+      _expose
     end
 
     def _key_down(data)
@@ -185,10 +189,10 @@ module RWaylandTk
     end
 
     def show
-      invalidate
-      realloc_buffer
-      draw
-      _expose
+      # invalidate
+      # realloc_buffer
+      # draw
+      # _expose
     end
   end
 end
