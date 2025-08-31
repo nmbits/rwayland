@@ -1,6 +1,5 @@
 require 'yaml'
 require 'wayland/wlobject'
-require 'wayland/code_generator'
 
 module Wayland
   module Protocol
