@@ -107,6 +107,75 @@ module Wayland
         end
       end
 
+      ZERO4 = "\0" * 4
+
+      # append zero to +str+ to be 4B aligned
+      #
+      # +str+   :: string
+      # +zterm+ :: returns zero terminated string
+      # +return+ :: string size
+      #
+      def pad_string(str, zterm)
+        len = str.bytesize
+        pad = 4 - (len % 4)
+        if pad == 4 && (!zterm || str.getbyte(-1) == 0)
+          str
+        else
+          str.bytesplice(len, pad, ZERO4, 0, pad)
+        end
+      end
+
+      def send_request(wlobj, sym, rspec, *margs, as: nil)
+        pack_template = rspec[:pack_template]
+        size = rspec[:base_size]
+        opcode = rspec[:opcode]
+        alist = [wlobj.wl_object_id, 0]
+        obj = nil
+        ancdata = nil
+        i = 0
+        rspec[:args].each do |arg|
+          case arg[:type]
+          when :string, :array
+            str = pad_string margs[i], arg[:type] == :string
+            str_size = str.bytesize
+            size += (str_size + 4) << 16
+            alist << str_size
+            alist << str
+            i += 1
+          when :new_id
+            interface = arg[:interface]
+            if interface
+              obj = create_object interface, nil, as
+            else
+              obj = create_object margs[i], nil, as
+              i += 1
+            end
+            alist << obj.wl_object_id
+          when :fd
+            ancdata = Socket::AncillaryData.int(:UNIX, :SOCKET, :RIGHTS, margs[i])
+            i += 1
+          when :object
+            alist << margs[i].wl_object_id
+            i += 1
+          when :fixed
+            alist << (margs[i] * (2 ** 8)).to_i
+            i += 1
+          else
+            alist << margs[i]
+            i += 1
+          end
+        end
+        alist[1] = opcode | size
+        message = alist.pack pack_template
+        if ancdata
+          sendmsg message, ancdata
+        else
+          sendmsg message
+        end
+        request_log wlobj, sym, *alist
+        return obj
+      end
+
       def disconnect
         if @socket
           @dispatcher.close
