@@ -1,6 +1,5 @@
 require 'socket'
 require 'wayland/wlobject'
-require 'wayland/dispatcher'
 require 'wayland/message_buffer'
 require 'wayland/free_list'
 require 'wayland/object_manager'
@@ -15,7 +14,6 @@ module Wayland
 
       def initialize(wl_object_id)
         super wl_object_id, self
-        @dispatcher = Dispatcher.new self
         @message_buffer = MessageBuffer.new
         @ios = []
       end
@@ -104,7 +102,6 @@ module Wayland
 
       def disconnect
         if @socket
-          @dispatcher.close
           @socket.close
           @socket = nil
         end
