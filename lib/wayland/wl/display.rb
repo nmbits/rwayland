@@ -1,6 +1,7 @@
 require 'socket'
 require 'wayland/wlobject'
 require 'wayland/dispatcher'
+require 'wayland/message_buffer'
 require 'wayland/free_list'
 require 'wayland/object_manager'
 require 'wayland/util'
@@ -15,23 +16,24 @@ module Wayland
       def initialize(wl_object_id)
         super wl_object_id, self
         @dispatcher = Dispatcher.new self
+        @message_buffer = MessageBuffer.new
+        @ios = []
       end
       attr_reader :socket
 
       def dispatch(timeout = nil)
         count = 0
         rd = [@socket]
-        ios = []
         loop do
           if IO.select(rd, [], [], timeout)
             str, addr, int, *ctls = @socket.recvmsg(256, 0, nil, :scm_rights => true)
+            @message_buffer.write str
             ctls.each do |a|
               if a.cmsg_is?(:SOCKET, :RIGHTS)
-                a.unix_rights.each{|io| ios << io }
+                a.unix_rights.each{|io| @ios << io }
               end
             end
-            count = @dispatcher.feed str, ios
-            ios.clear
+            count = Protocol.dispatch self, @message_buffer, @ios
           end
           break if count > 0 || timeout
         end

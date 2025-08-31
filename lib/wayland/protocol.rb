@@ -129,5 +129,65 @@ module Wayland
       display.request_log wlobj, sym, *alist
       return obj
     end
+
+    def dispatch(display, buffer, ios)
+      count = 0
+      loop do
+        break if buffer.bytesize < 8
+        oid, opsz = buffer.peek(8).unpack "LL"
+        if oid == 0
+          buffer.discard 8
+          next
+        end
+        opcode = opsz & 0xffff
+        size = (opsz >> 16)
+        break if buffer.bytesize < size
+        buffer.discard 8
+        dispatch_event display, oid, opcode, buffer, size - 8, ios
+        count += 1
+      end
+      count
+    end
+
+    GUARD = WLObject.new nil, nil
+
+    def dispatch_event(display, oid, opcode, buffer, size, ios)
+      object = display.get_object oid
+      raise "object 0x#{oid.to_s(16)} not found" unless object
+      intf = Protocol[object.ifname]
+      evs = intf[:events]
+      ev = evs ? evs[opcode] : nil
+      unless ev
+        pp [opcode, object.ifname, evs]
+        raise RuntimeError
+      end
+      name = ev[:name]
+      args = ev[:args].map do |a|
+        case a[:type]
+        when :int
+          buffer.read_int
+        when :uint
+          buffer.read_uint
+        when :object
+          display.get_object buffer.read_object
+        when :fixed
+          buffer.read_fixed
+        when :new_id
+          display.create_object a[:interface], buffer.read_object
+        when :string
+          buffer.read_string
+        when :array
+          buffer.read_array
+        when :fd
+          ios.shift || raise("no io for fd arg")
+        end
+      end
+      f = object.respond_to?(name)
+      if f && GUARD.respond_to?(name)
+        raise "event #{name} rejected"
+      end
+      display.event_log f, oid, object.ifname, name, *args
+      object.__send__ name, *args if f
+    end
   end
 end

@@ -42,20 +42,32 @@ module Wayland
       end
     end
 
-    def read(bytes)
-      retval = String.new
-      raise RangeError if bytes > self.bytesize
-      rem = bytes
-      while rem > 0
-        cp_last = (@rd <= @wr ? @wr : @buffer.bytesize)
-        cp_cap = cp_last - @rd
-        cp_sz = rem < cp_cap ? rem : cp_cap
-        retval << @buffer.byteslice(@rd, cp_sz)
-        rem -= cp_sz
-        @rd += cp_sz
-        @rd = 0 if @rd >= @buffer.bytesize
+    def read(bytes, opt = nil)
+      retval = opt == :discard ? nil : String.new
+      if bytes > self.bytesize
+        raise RangeError
       end
+      rem = bytes
+      rd = @rd
+      while rem > 0
+        cp_last = (rd <= @wr ? @wr : @buffer.bytesize)
+        cp_cap = cp_last - rd
+        cp_sz = rem < cp_cap ? rem : cp_cap
+        retval << @buffer.byteslice(rd, cp_sz) unless opt == :discard
+        rem -= cp_sz
+        rd += cp_sz
+        rd = 0 if rd >= @buffer.bytesize
+      end
+      @rd = rd unless opt == :peek
       retval
+    end
+
+    def peek(bytesize)
+      read bytesize, :peek
+    end
+
+    def discard(bytesize)
+      read bytesize, :discard
     end
 
     def read_object
