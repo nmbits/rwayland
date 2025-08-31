@@ -4,6 +4,11 @@ require 'wayland/util'
 
 module Wayland
   module Protocol
+    INT_RANGE           = (-2147483648..2147483647)
+    UINT_RANGE          = (0..4294967295)
+    CLIENT_OBJECT_RANGE = (1..0xFEFFFFFF)
+    FIXED_RANGE         = ((-0x80000000.to_f / 2**8)..(0x7fffffff.to_f / 2**8))
+
     @interfaces = {}
 
     TYPE_TEMPLATE_CHAR = {
@@ -77,6 +82,18 @@ module Wayland
         setup_request_methods clazz, ispec[:requests]
         setup_enums clazz, ispec[:enums]
       end
+    end
+
+    def check_int(value)
+      value.is_a?(Integer) && INT_RANGE.include?(value)
+    end
+
+    def check_uint(value)
+      value.is_a?(Integer) && UINT_RANGE.include?(value)
+    end
+
+    def check_fixed(value)
+      value.is_a?(Float) && FIXED_RANGE.include?(value)
     end
 
     def send_request(display, wlobj, sym, rspec, *margs, as: nil)

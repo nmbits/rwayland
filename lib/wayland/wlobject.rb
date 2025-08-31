@@ -2,11 +2,6 @@ require 'wayland/protocol'
 
 module Wayland
   class WLObject
-    INT_RANGE           = (-2147483648..2147483647)
-    UINT_RANGE          = (0..4294967295)
-    CLIENT_OBJECT_RANGE = (1..0xFEFFFFFF)
-    FIXED_RANGE         = ((-0x80000000.to_f / 2**8)..(0x7fffffff.to_f / 2**8))
-
     attr_reader :wl_object_id
     undef :initialize_copy
 
@@ -33,18 +28,6 @@ module Wayland
       end
       define_singleton_method event do |*a| delegate.__send__ name, *a end
       self
-    end
-
-    def check_int(value)
-      value.is_a?(Integer) && INT_RANGE.include?(value)
-    end
-
-    def check_uint(value)
-      value.is_a?(Integer) && UINT_RANGE.include?(value)
-    end
-
-    def check_fixed(value)
-      value.is_a?(Float) && FIXED_RANGE.include?(value)
     end
 
     def deleted
