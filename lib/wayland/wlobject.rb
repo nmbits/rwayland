@@ -35,18 +35,6 @@ module Wayland
       self
     end
 
-    def pad_array(s)
-      len = s.bytesize
-      pad = (4 - (len & 3)) & 3
-      s << "\0" * pad
-      s
-    end
-
-    def pad_string(str)
-      s = str.getbyte(-1) > 0 ? str + "\0" : str
-      pad_array(s)
-    end
-
     def check_int(value)
       value.is_a?(Integer) && INT_RANGE.include?(value)
     end
