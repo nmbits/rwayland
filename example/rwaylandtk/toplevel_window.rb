@@ -14,8 +14,18 @@ module RWaylandTk
       @wl_surface = @display[:wl_compositor].create_surface as: [WlSurface, self]
       @xdg_surface = @display[:xdg_wm_base].get_xdg_surface @wl_surface, as: [XdgSurface, self]
       @xdg_toplevel = @xdg_surface.get_toplevel as: [XdgToplevel, self]
+      if @display[:zxdg_decoration_manager_v1]
+        @server_decoration = true
+        dm = @display[:zxdg_decoration_manager_v1]
+        @zxdg_toplevel_decoration = dm.get_toplevel_decoration @xdg_toplevel
+        mode = @server_decoration ?
+                 Wayland::Zxdg::ToplevelDecorationV1[:mode][:server_side] :
+                 Wayland::Zxdg::ToplevelDecorationV1[:mode][:client_side]
+        @zxdg_toplevel_decoration.set_mode mode
+      end
     end
     attr_reader :width, :height
+    attr_reader :server_decoration
 
     # User hook
 

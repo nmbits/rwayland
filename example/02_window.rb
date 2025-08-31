@@ -13,7 +13,7 @@ class MyApplicationWindow < RWaylandTk::ToplevelWindow
     super
     set_title("Example Window", "Example App")
     @text = File.read __FILE__
-    @ty = TITLE_BAR_SIZE
+    @ty = server_decoration ? 0 : TITLE_BAR_SIZE
     @cursor = 0
   end
 
@@ -25,11 +25,17 @@ class MyApplicationWindow < RWaylandTk::ToplevelWindow
   def mouse_down(button, time, serial)
     return unless @py
     seat = @display[:wl_seat]
-    if @py < TITLE_BAR_SIZE
-      @xdg_toplevel.move(seat, serial)
-    elsif @px > width - RESIZER_SIZE && @py > height - RESIZER_SIZE
-      @xdg_toplevel.resize(seat, serial, Wayland::Xdg::Toplevel[:resize_edge].bottom_right)
-    else
+    consumed = false
+    unless server_decoration
+      if @py < TITLE_BAR_SIZE
+        @xdg_toplevel.move(seat, serial)
+        consumed = true
+      elsif @px > width - RESIZER_SIZE && @py > height - RESIZER_SIZE
+        @xdg_toplevel.resize(seat, serial, Wayland::Xdg::Toplevel[:resize_edge].bottom_right)
+        consumed = true
+      end
+    end
+    unless consumed
       lx = @px
       ly = @py - @ty
       ans = content_pango_layout.xy_to_index lx * Pango::SCALE, ly * Pango::SCALE
@@ -144,27 +150,30 @@ class MyApplicationWindow < RWaylandTk::ToplevelWindow
       context.set_source_color [0.2, 0.3, 0.2, 1]
       context.show_pango_layout layout
 
-      # title bar
-      title_bar_layout = title_bar_pango_layout
-      tw, th = title_bar_layout.pixel_size
-      tx = (width - tw) / 2
-      ty = (TITLE_BAR_SIZE - th) / 2
-      context.set_source_color [0, 0, 0, 0.5]
-      context.rectangle 0, 0, width, TITLE_BAR_SIZE
-      context.fill
-      context.move_to tx, ty
-      context.set_source_color [0.9, 0.9, 0.9, 1]
-      context.show_pango_layout title_bar_layout
+      unless server_decoration
+        # title bar
+        title_bar_layout = title_bar_pango_layout
+        tw, th = title_bar_layout.pixel_size
+        tx = (width - tw) / 2
+        ty = (TITLE_BAR_SIZE - th) / 2
+        context.set_source_color [0, 0, 0, 0.5]
+        context.rectangle 0, 0, width, TITLE_BAR_SIZE
+        context.fill
+        context.move_to tx, ty
+        context.set_source_color [0.9, 0.9, 0.9, 1]
+        context.show_pango_layout title_bar_layout
 
-      # resizer
-      context.set_source_color [0, 0, 0, 0.5]
-      context.rectangle width - RESIZER_SIZE, height - RESIZER_SIZE, RESIZER_SIZE, RESIZER_SIZE
-      context.fill
+        # resizer
+        context.set_source_color [0, 0, 0, 0.5]
+        context.rectangle width - RESIZER_SIZE, height - RESIZER_SIZE, RESIZER_SIZE, RESIZER_SIZE
+        context.fill
+      end
     end
   end
 end
 
 if __FILE__ == $0
+  Wayland::Protocol.load_yaml File.join(File.dirname(__FILE__), "xdg-decoration-unstable-v1.yaml")
   RWaylandTk.init
   w = MyApplicationWindow.new(640, 480).show
   RWaylandTk.main_loop

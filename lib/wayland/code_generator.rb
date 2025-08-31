@@ -61,7 +61,13 @@ end
 
 if __FILE__ == $0
   require 'yaml'
-  yaml = File.join File.dirname(__FILE__), 'wayland.yaml'
+  def usage
+    STDERR.puts "usage: #{$0} yaml_path"
+    exit 1
+  end
+  yaml_path = ARGV.shift
+  usage if yaml_path.nil? || !File.exist?(yaml_path)
+  yaml = File.join yaml_path
   data = YAML.load_file yaml
   data.each do |ifname, ispec|
     gen = Wayland::CodeGenerator.new ifname, ispec
