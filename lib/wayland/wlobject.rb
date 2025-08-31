@@ -29,9 +29,5 @@ module Wayland
       define_singleton_method event do |*a| delegate.__send__ name, *a end
       self
     end
-
-    def deleted
-      @display.delete_log self
-    end
   end
 end

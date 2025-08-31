@@ -68,7 +68,7 @@ module Wayland
     def delete_id(oid)
       if obj = @map.delete(oid)
         @free_list.free oid
-        obj.deleted
+        @display.delete_log obj
       end
     end
 
