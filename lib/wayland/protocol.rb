@@ -1,5 +1,6 @@
 require 'yaml'
 require 'wayland/wlobject'
+require 'wayland/util'
 
 module Wayland
   module Protocol
@@ -41,7 +42,7 @@ module Wayland
         end
         clazz.define_method name do |*args, **hash|
           rspec = Wayland::Protocol[ifname][:requests][__callee__]
-          @display.send_request self, __callee__, rspec, *args, **hash
+          Protocol.send_request @display, self, __callee__, rspec, *args, **hash
         end
       end
     end
@@ -76,6 +77,57 @@ module Wayland
         setup_request_methods clazz, ispec[:requests]
         setup_enums clazz, ispec[:enums]
       end
+    end
+
+    def send_request(display, wlobj, sym, rspec, *margs, as: nil)
+      pack_template = rspec[:pack_template]
+      size = rspec[:base_size]
+      opcode = rspec[:opcode]
+      alist = [wlobj.wl_object_id, 0]
+      obj = nil
+      ancdata = nil
+      i = 0
+      rspec[:args].each do |arg|
+        case arg[:type]
+        when :string, :array
+          str = Util.pad_string margs[i], arg[:type] == :string
+          str_size = str.bytesize
+          size += (str_size + 4) << 16
+          alist << str_size
+          alist << str
+          i += 1
+        when :new_id
+          interface = arg[:interface]
+          if interface
+            obj = display.create_object interface, nil, as
+          else
+            obj = display.create_object margs[i], nil, as
+            i += 1
+          end
+          alist << obj.wl_object_id
+        when :fd
+          ancdata = Socket::AncillaryData.int(:UNIX, :SOCKET, :RIGHTS, margs[i])
+          i += 1
+        when :object
+          alist << margs[i].wl_object_id
+          i += 1
+        when :fixed
+          alist << (margs[i] * (2 ** 8)).to_i
+          i += 1
+        else
+          alist << margs[i]
+          i += 1
+        end
+      end
+      alist[1] = opcode | size
+      message = alist.pack pack_template
+      if ancdata
+        display.socket.sendmsg message, 0, nil, ancdata
+      else
+        display.socket.sendmsg message, 0, nil
+      end
+      display.request_log wlobj, sym, *alist
+      return obj
     end
   end
 end
