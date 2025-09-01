@@ -23,7 +23,7 @@ module Wayland
       if pad == 4 && (!zterm || str.getbyte(-1) == 0)
         str
       else
-        str.bytesplice(len, pad, ZERO4, 0, pad)
+        str.dup.bytesplice(len, pad, ZERO4, 0, pad)
       end
     end
   end
