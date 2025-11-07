@@ -127,7 +127,8 @@ module Wayland
       end
 
       def request_log(obj, name, *a)
-        @logger&.debug "RQ: (#{obj.wl_object_id}) #{obj.ifname}::#{name} #{a}"
+        b = a.map{|e| Integer === e ? "0x%08x" % e : e }
+        @logger&.debug "RQ: (#{obj.wl_object_id}) #{obj.ifname}::#{name} #{b}"
       end
 
       def create_log(obj)

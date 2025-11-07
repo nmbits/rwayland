@@ -107,9 +107,8 @@ module Wayland
       rspec[:args].each do |arg|
         case arg[:type]
         when :string, :array
-          str = Util.pad_string margs[i], arg[:type] == :string
-          str_size = str.bytesize
-          size += (str_size + 4) << 16
+          str, str_size = Util.pad_string margs[i], arg[:type] == :string
+          size += (str.bytesize + 4) << 16
           alist << str_size
           alist << str
           i += 1
@@ -138,12 +137,12 @@ module Wayland
       end
       alist[1] = opcode | size
       message = alist.pack pack_template
+      display.request_log wlobj, sym, pack_template, *alist, message
       if ancdata
         display.socket.sendmsg message, 0, nil, ancdata
       else
         display.socket.sendmsg message, 0, nil
       end
-      display.request_log wlobj, sym, *alist
       return obj
     end
 

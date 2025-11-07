@@ -15,16 +15,18 @@ module Wayland
     #
     # +str+   :: string
     # +zterm+ :: returns zero terminated string
-    # +return+ :: string size
+    # +return+ :: string, str_size
     #
     def pad_string(str, zterm)
       len = str.bytesize
       pad = 4 - (len % 4)
-      if pad == 4 && (!zterm || str.getbyte(-1) == 0)
+      zterm = zterm && (str.getbyte(-1) != 0)
+      if pad == 4 && !zterm
         str
       else
         str.dup.bytesplice(len, pad, ZERO4, 0, pad)
       end
+      return str, len + (zterm ? 1 : 0)
     end
   end
 end
