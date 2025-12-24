@@ -9,8 +9,14 @@ module Wayland
       cairo_so = $".find {|f| File.basename(f) == "cairo.so" }
       raise "cairo.so not found" unless cairo_so
       dlload cairo_so
-      extern "void *rb_cairo_surface_to_ruby_object(void *)"
       extern "void *cairo_image_surface_create_for_data(void *, int, int, int, int)"
+      addr = handler.sym "rb_cairo_surface_to_ruby_object"
+      RB_CAIRO_SURFACE_TO_RUBY_OBJECT =
+        Fiddle::Function.new(addr, [Fiddle::TYPE_VOIDP], Fiddle::TYPE_UINTPTR_T, need_gvl: true)
+      module_function
+      def rb_cairo_surface_to_ruby_object(adr)
+        RB_CAIRO_SURFACE_TO_RUBY_OBJECT.call adr
+      end
     end
 
     module_function
