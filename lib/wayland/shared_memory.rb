@@ -22,6 +22,8 @@ module Wayland
       extern "int munmap(void *, size_t)"
     end
 
+    undef_method :initialize_dup, :initialize_clone, :initialize_copy
+
     class Tag < Struct.new(:io, :size, :address)
       def destroy
         F.munmap address, size if address
@@ -53,17 +55,23 @@ module Wayland
         errno = Fiddle.last_error
         raise "shm_open() failed. errno = #{errno}"
       end
-      if F.ftruncate(fd, size) != 0
-        F.close fd
-        errno = Fiddle.last_error
-        raise "ftruncate() failed. errno = #{errno}"
-      end
+      truncate fd, size
       fd
     end
     private :new_shm
 
+    def truncate(fd, size)
+      if F.ftruncate(fd, size) != 0
+        errno = Fiddle.last_error
+        raise "ftruncate() failed. errno = #{errno}"
+      end
+    end
+    private :truncate
+
     def initialize(fd = nil, size: nil, mode: nil,
                    prot: PROT_RDWR, flags: MAP_SHARED)
+      @prot = prot
+      @flags = flags
       io = nil
       if size.nil? || size <= 0
         raise ArgumentError, "size must be greater than 0"
@@ -71,7 +79,7 @@ module Wayland
       case fd
       when nil
         mode = 0600 unless mode
-        fd = new_shm(size, mode)
+        fd = new_shm size, mode
         io = IO.for_fd fd
       when Integer
         raise ArgumentError, "fd must be greater than 0" if fd < 0
@@ -84,7 +92,7 @@ module Wayland
       @tag = Tag.new io, size, nil
       @@tags[self.object_id] = @tag
       ObjectSpace.define_finalizer self, SharedMemory.finalizer
-      mmap prot, flags
+      mmap
     end
 
     def close
@@ -93,14 +101,16 @@ module Wayland
         @tag.io = nil
       end
     end
+    private :close
 
-    def mmap(prot, flags)
-      raise "io already closed" unless io
-      fd = io.to_i
+    def mmap
       unless @tag.address
+        raise FrozenError, "can't modify frozen memory mapping" if frozen?
+        raise "io already closed" unless @tag.io
+        fd = @tag.io.to_i
         ptr = MAP_FAILED
         20.times do
-          ptr = F.mmap nil, size, prot, flags, fd, 0
+          ptr = F.mmap nil, @tag.size, @prot, @flags, fd, 0
           break unless ptr == MAP_FAILED
           errno = Fiddle.last_error
           next if errno == Errno::EAGAIN
@@ -111,6 +121,34 @@ module Wayland
       end
     end
     private :mmap
+
+    def munmap()
+      if @tag.address
+        raise FrozenError, "can't modify frozen memory mapping" if frozen?
+        F.munmap @tag.address, @tag.size
+        @tag.address = nil
+      end
+    end
+    private :munmap
+
+    def resize(newsize)
+      raise RangeError, "new size must be greater than old size" if newsize < size
+      return nil if newsize == size
+      raise "io already closed" unless @tag.io
+      raise FrozenError, "can't modify frozen memory mapping" if frozen?
+      munmap
+      truncate @tag.io.to_i, newsize
+      @tag.size = newsize
+      mmap
+      nil
+    end
+
+    def freeze
+      unless frozen?
+        close
+        super
+      end
+    end
 
     def address
       @tag.address
