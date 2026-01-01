@@ -112,7 +112,6 @@ module RWaylandTk
                                                         Wayland::XkbSupport::XKB_KEYMAP_FORMAT_TEXT_V1,
                                                         Wayland::XkbSupport::XKB_KEYMAP_COMPILE_NO_FLAGS)
           @xkb_state = @xkb_keymap.state_new
-          shm.close
         else
           raise "unknonw keymap format received #{fmt}"
         end

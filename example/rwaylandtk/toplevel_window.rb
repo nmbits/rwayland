@@ -173,7 +173,6 @@ module RWaylandTk
         buffer = pool.create_buffer(0, width, height, stride, format,
                                     as: [WlBuffer, width, height, stride, format, shm])
         pool.destroy
-        shm.close
         @wl_buffer.destroy_on_release if @wl_buffer
         cairo = buffer.cairo_context
         cairo.save do
