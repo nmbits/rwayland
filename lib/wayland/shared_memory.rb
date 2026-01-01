@@ -70,6 +70,7 @@ module Wayland
 
     def initialize(fd = nil, size: nil, mode: nil,
                    prot: PROT_RDWR, flags: MAP_SHARED)
+      @allocated = 0
       @prot = prot
       @flags = flags
       io = nil
@@ -93,6 +94,14 @@ module Wayland
       @@tags[self.object_id] = @tag
       ObjectSpace.define_finalizer self, SharedMemory.finalizer
       mmap
+    end
+
+    def allocate(size)
+      if size <= @tag.size
+        offset = @allocated
+        @allocated += size
+        offset
+      end
     end
 
     def close
