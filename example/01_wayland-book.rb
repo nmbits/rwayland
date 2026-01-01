@@ -40,7 +40,6 @@ module WaylandBook
     pool = display[:wl_shm].create_pool(shared_memory.fd, size)
     buffer = pool.create_buffer(0, width, height, stride, Wayland::Wl::Shm[:format].xrgb8888)
     pool.destroy
-    shared_memory.close
 
     offset = state.offset.to_i % 8
 
