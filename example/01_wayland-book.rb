@@ -36,7 +36,6 @@ module WaylandBook
 
     shared_memory = Wayland::SharedMemory.new size: size
 
-    data = Fiddle::Pointer.new shared_memory.address
     pool = display[:wl_shm].create_pool(shared_memory.fd, size)
     buffer = pool.create_buffer(0, width, height, stride, Wayland::Wl::Shm[:format].xrgb8888)
     pool.destroy
@@ -49,9 +48,9 @@ module WaylandBook
     height.times do |y|
       width.times do |x|
         if (((x + offset) + (y + offset) / 8 * 8) % 16 < 8)
-          data[y * stride + x * 4, 4] = ff6666ee
+          shared_memory.write(y * stride + x * 4, ff6666ee, 4)
         else
-          data[y * stride + x * 4, 4] = ffeeeeee
+          shared_memory.write(y * stride + x * 4, ffeeeeee, 4)
         end
       end
     end
