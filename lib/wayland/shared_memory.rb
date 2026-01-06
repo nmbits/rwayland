@@ -96,12 +96,14 @@ module Wayland
       mmap
     end
 
-    def allocate(size)
-      if size <= @tag.size
-        offset = @allocated
-        @allocated += size
-        offset
+    def allocate(size, resize: false)
+      if size + @allocated > @tag.size
+        return nil unless resize
+        self.resize size + @allocated
       end
+      offset = @allocated
+      @allocated += size
+      offset
     end
 
     def close
@@ -114,7 +116,7 @@ module Wayland
 
     def mmap
       unless @tag.address
-        raise FrozenError, "can't modify frozen memory mapping" if frozen?
+        raise FrozenError, "can't change frozen memory mapping" if frozen?
         raise "io already closed" unless @tag.io
         fd = @tag.io.to_i
         ptr = MAP_FAILED
@@ -127,29 +129,60 @@ module Wayland
         end
         raise "mmap() failed" if ptr == MAP_FAILED
         @tag.address = ptr.to_i
+        @pointer = ptr
       end
     end
     private :mmap
 
     def munmap()
       if @tag.address
-        raise FrozenError, "can't modify frozen memory mapping" if frozen?
+        raise FrozenError, "can't change frozen memory mapping" if frozen?
         F.munmap @tag.address, @tag.size
         @tag.address = nil
+        @pointer = nil
       end
     end
     private :munmap
 
     def resize(newsize)
-      raise RangeError, "new size must be greater than old size" if newsize < size
+      raise RangeError, "new size must be greater than current size" if newsize < size
       return nil if newsize == size
       raise "io already closed" unless @tag.io
-      raise FrozenError, "can't modify frozen memory mapping" if frozen?
+      raise FrozenError, "can't change frozen memory mapping" if frozen?
       munmap
       truncate @tag.io.to_i, newsize
       @tag.size = newsize
       mmap
       nil
+    end
+
+    def read(offset, bytes)
+      if offset < 0 || offset >= @tag.size
+        raise RangeError, "offset exceeds size"
+      end
+      if bytes <= 0
+        raise ArgumentError, "bytes should be greather than 0"
+      end
+      if offset + bytes > @tag.size
+        bytes = offset + bytes - @tag.size
+      end
+      @pointer[offset, bytes]
+    end
+
+    def write(offset, str, bytes = nil, resize: false)
+      bytes = str.bytesize if bytes.nil?
+      if offset < 0 || offset >= @tag.size
+        raise RangeError, "offset exceeds size"
+      end
+      if bytes <= 0
+        raise ArgumentError, "bytes should be greather than 0"
+      end
+      if offset + bytes > @tag.size
+        raise RangeError, "string exceeds size" unless resize
+        newsize = offset + bytes
+        self.resize newsize
+      end
+      @pointer[offset, bytes] = str
     end
 
     def freeze
