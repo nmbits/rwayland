@@ -3,7 +3,7 @@ require "wayland/shared_memory"
 module Wayland
   module Util
     class ImagePool
-      DEFAULT_POOL_SIZE = 1024
+      DEFAULT_POOL_SIZE = 4096
       Entry = Struct.new(:offset, :width, :height, :stride, :format, :buffer)
 
       def initialize(wl_shm, size = nil)
