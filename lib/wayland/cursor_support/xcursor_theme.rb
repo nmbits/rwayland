@@ -17,6 +17,10 @@ module Wayland
         @xcursors[name]
       end
 
+      def each(&blk)
+        @xcursors.each_value &blk
+      end
+
       def self.library_path
         env_var = ENV["XCURSOR_PATH"]
         return [env_var] if env_var

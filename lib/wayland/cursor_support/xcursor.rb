@@ -7,6 +7,9 @@ module Wayland
       XCURSOR_IMAGE_VERSION = 1
       XCURSOR_IMAGE_MAX_SIZE = 0x7fff
 
+      class Image < Struct.new(:version, :width, :height, :xhots, :yhots, :delay, :size, :pixels)
+      end
+
       class FileHeader < Struct.new(:magic, :header, :version, :ntoc, :tocs)
         def each_toc(&blk)
           if block_given?
@@ -58,6 +61,14 @@ module Wayland
 
       def cursor_image(i)
         @cursor_images[i]
+      end
+
+      def each(&blk)
+        @cursor_images.each &blk
+      end
+
+      def count_image
+        @cursor_images.size
       end
 
       def self.load_path(path, size)
@@ -116,13 +127,12 @@ module Wayland
 
       def self.read_image(io, toc)
         ch = read_chunk_header(io, toc)
-        im = CursorImage.new
-        im.version = XCURSOR_IMAGE_VERSION
-        im.width  = readu32le(io)
-        im.height = readu32le(io)
-        im.xhots  = readu32le(io)
-        im.yhots  = readu32le(io)
-        im.delay  = readu32le(io)
+        im = Image.new XCURSOR_IMAGE_VERSION, # version
+                       readu32le(io),         # width
+                       readu32le(io),         # height
+                       readu32le(io),         # xhots
+                       readu32le(io),         # yhots
+                       readu32le(io)          # delay
         if im.width > XCURSOR_IMAGE_MAX_SIZE || im.height > XCURSOR_IMAGE_MAX_SIZE ||
            im.width == 0 || im.height == 0 || im.xhots > im.width || im.yhots > im.height
           raise "Invalid file"
