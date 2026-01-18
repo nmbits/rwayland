@@ -1,7 +1,6 @@
 require "wayland/util/image_pool"
-require "wayland/cursor_support/xcursor"
-require "wayland/cursor_support/xcursor_theme"
 require "wayland/cursor_support/cursor"
+require "wayland/cursor_support/xcursor"
 
 module Wayland
   module CursorSupport
