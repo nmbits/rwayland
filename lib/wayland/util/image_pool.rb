@@ -4,7 +4,8 @@ module Wayland
   module Util
     class ImagePool
       DEFAULT_POOL_SIZE = 4096
-      Entry = Struct.new(:offset, :width, :height, :stride, :format, :buffer)
+      Entry = Struct.new(:offset, :attr, :buffer)
+      Attribute = Struct.new(:width, :height, :stride, :format)
 
       def initialize(wl_shm, size = nil)
         @size = size || DEFAULT_POOL_SIZE
@@ -24,14 +25,30 @@ module Wayland
         end
         @shm.write offset, pixels, asize
         index = @images.size
-        @images << Entry.new(offset, width, height, stride, format, nil)
+        attr = Attribute.new(width, height, stride, format).freeze
+        @images << Entry.new(offset, attr, nil)
         index
       end
 
       def get_buffer(index, as: nil)
         raise RangeError, "index out of range" if index < 0 || index >= @images.size
         e = @images[index]
-        e.buffer ||= @pool.create_buffer e.offset, e.width, e.height, e.stride, e.format, as: as
+        unless e.buffer
+          a = e.attr
+          e.buffer = @pool.create_buffer e.offset, a.width, a.height, a.stride, a.format, as: as
+        end
+        e.buffer
+      end
+
+      def attribute(index)
+        raise RangeError, "index out of range" if index < 0 || index >= @images.size
+        @images[index].attr
+      end
+
+      def pixels(index)
+        raise RangeError, "index out of range" if index < 0 || index >= @images.size
+        a = attribute(index)
+        @shm.read(a.offset, a.height * a.stride)
       end
     end
   end
