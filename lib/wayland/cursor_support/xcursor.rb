@@ -195,7 +195,7 @@ module Wayland
             if File.readable? file
               begin
                 xcursor = XCursor.load_path(file, size)
-                xcursors[xcursor->name] ||= xcursor
+                xcursors[xcursor.name] ||= xcursor
               rescue => e
               end
             end

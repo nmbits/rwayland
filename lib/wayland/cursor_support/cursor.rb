@@ -33,6 +33,7 @@ module Wayland
 
     class Cursor
       def initialize(theme, name)
+        @theme = theme
         @name = name
         @images = []
       end
@@ -58,7 +59,7 @@ module Wayland
         @image_pool = image_pool
         @cursors = {}
       end
-      attr_readder :name, :image_pool
+      attr_reader :name, :image_pool
 
       def [](name)
         @cursors[name]
@@ -69,7 +70,7 @@ module Wayland
       end
 
       def add_cursor_image(name, width, height, hotspot_x, hotspot_y, delay, pixels)
-        cursor = (@cursors[name] ||= Cursor.new(name))
+        cursor = (@cursors[name] ||= Cursor.new(self, name))
         index = @image_pool.add_image width, height, width * 4,
                                       Wayland::Wl::Shm[:format].argb8888, pixels
         image = CursorImage.new cursor, index, hotspot_x, hotspot_y, delay

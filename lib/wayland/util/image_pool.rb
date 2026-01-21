@@ -47,8 +47,9 @@ module Wayland
 
       def pixels(index)
         raise RangeError, "index out of range" if index < 0 || index >= @images.size
+        e = @images[index]
         a = attribute(index)
-        @shm.read(a.offset, a.height * a.stride)
+        @shm.read(e.offset, a.height * a.stride)
       end
     end
   end
