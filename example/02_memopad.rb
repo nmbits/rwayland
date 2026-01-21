@@ -186,7 +186,6 @@ class ToplevelWindow
 end
 
 if __FILE__ == $0
-  Wayland::Protocol.load_yaml File.join(File.dirname(__FILE__), "xdg-decoration-unstable-v1.yaml")
   MiW::Wl.init
   toplevel_window = ToplevelWindow.new 640, 480
   MiW::Wl.main_loop

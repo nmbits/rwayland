@@ -37,7 +37,7 @@ module MiW
       BTN_BACK    = 0x116
       BTN_TASK    = 0x117
 
-      class ClientDecoration
+      class Decoration
         def initialize(toplevel)
           @toplevel = toplevel
         end
@@ -62,13 +62,93 @@ module MiW
           (states & STATE_FULLSCREEN) > 0
         end
 
+        def title_bar?(state)
+          false
+        end
+
+        def adjust_window_geometry(rec_width, rec_height, bounds_width, bounds_height, states)
+          bw = bounds_width  || Float::INFINITY
+          bh = bounds_height || Float::INFINITY
+
+          # initial size
+          iw = rec_width
+          ih = rec_height
+
+          # window size
+          ww = [iw, bw].min
+          wh = [ih, bh].min
+
+          # widow geometry
+          wx = border_left?(states) ? BORDER_WIDTH : 0
+          wy = border_top?(states)  ? BORDER_WIDTH : 0
+
+          Rectangle.new wx, wy, ww, wh
+        end
+
+        # Descide surface size and window geometry based on init_size
+        #
+        def initial_window_geometry(client_width, client_height, bounds_width, bounds_height, states)
+          # initial size
+          iw = client_width
+          ih = client_height + (title_bar?(states) ? TITLEBAR_HEIGHT : 0)
+          adjust_window_geometry iw, ih, bounds_width, bounds_height, states
+        end
+
+        def adjust_client_geometry(client_geometry, window_geometry, states)
+          client_geometry.x      = window_geometry.x
+          client_geometry.y      = window_geometry.y
+          client_geometry.width  = window_geometry.width
+          client_geometry.height = window_geometry.height
+          if title_bar? states
+            client_geometry.y      += TITLEBAR_HEIGHT
+            client_geometry.height -= TITLEBAR_HEIGHT
+          end
+        end
+
+        def adjust_surface_size(window, window_geometry, states)
+          sw = window_geometry.width
+          sh = window_geometry.height
+          sw += BORDER_WIDTH if border_left? states
+          sw += BORDER_WIDTH if border_right? states
+          sh += BORDER_WIDTH if border_top? states
+          sh += BORDER_WIDTH if border_bottom? states
+          window.resize_to sw, sh
+        end
+
+        def draw(cairo)
+        end
+
+        def hit_test(x, y, window_geometry, states)
+          :client
+        end
+
+        def pointer_enter(x, y)
+        end
+
+        def pointer_motion(time, x, y)
+        end
+
+        def pointer_leave
+        end
+
+        def pointer_button(time, button, state)
+        end
+
+        def activated(active)
+        end
+
+        def resized
+        end
+      end
+
+      class ClientDecoration < Decoration
         def title_bar?(states)
           !fullscreen?(states)
         end
 
         def adjust_window_geometry(rec_width, rec_height, bounds_width, bounds_height, states)
           bw = bounds_width  || Float::INFINITY
-          bh = bounds_height || Fload::INFINITY
+          bh = bounds_height || Float::INFINITY
 
           # initial size
           iw = rec_width
@@ -371,13 +451,20 @@ module MiW
         end
       end
 
-      class ServerDecoration
+      class ServerDecoration < Decoration
       end
 
       def initialize(client, width, height)
         super
-        @nonclient = ClientDecoration.new self
         @xdg_toplevel = @xdg_surface.get_toplevel as: [Private::XdgToplevel, self]
+        dm = MiW::Wl.display_instance[:zxdg_decoration_manager_v1]
+        if dm
+          @zxdg_toplevel_decoration_v1 = dm.get_toplevel_decoration(@xdg_toplevel)
+          @zxdg_toplevel_decoration_v1.set_mode Wayland::Zxdg::ToplevelDecorationV1[:mode].server_side
+          @nonclient = ServerDecoration.new self
+        else
+          @nonclient = ClientDecoration.new self
+        end
         commit_now
       end
       attr_reader :window_geometry

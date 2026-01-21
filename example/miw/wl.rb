@@ -1,10 +1,13 @@
 require 'wayland'
 require 'miw/wl/private'
+require 'logger'
 
 module MiW
   module Wl
     def self.init
+      Wayland::Protocol.load_yaml File.join(File.dirname(__FILE__), "xdg-decoration-unstable-v1.yaml")
       @display = Wayland::Wl::Display.connect
+      # @display.set_logger Logger.new(STDOUT)
       registry = @display.get_registry
       registry.set_global_module(wl_seat: Private::WlSeat)
       @display.roundtrip
