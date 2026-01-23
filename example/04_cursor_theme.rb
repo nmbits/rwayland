@@ -1,5 +1,4 @@
 $: << File.dirname(__FILE__)
-require "pango"
 require "miw/wl"
 require "miw/wl/toplevel"
 require "wayland/cursor_support"
@@ -85,11 +84,10 @@ class ToplevelWindow
 end
 
 if __FILE__ == $0
-  MiW::Wl.init
+  MiW::Wl.init(cursor_theme: "default", cursor_size: 24)
   display = MiW::Wl.display_instance
   wl_shm = display[:wl_shm]
-  cursor_theme = Wayland::CursorSupport.load_xcursor wl_shm, "default", 36
-  pp cursor_theme.names
+  cursor_theme = MiW::Wl.cursor_theme
   toplevel_window = ToplevelWindow.new 640, 480, cursor_theme
   MiW::Wl.main_loop
 end

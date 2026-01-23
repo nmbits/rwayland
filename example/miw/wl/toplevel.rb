@@ -4,7 +4,7 @@ require "miw/wl/private"
 module MiW
   module Wl
 
-    BORDER_WIDTH    = 8
+    BORDER_WIDTH    = 16
     TITLEBAR_HEIGHT = 40
 
     class Toplevel < Window
@@ -518,7 +518,7 @@ module MiW
       end
 
       def on_wl_pointer_enter(serial, x, y)
-        @serial = serial
+        @serial = @serial_enter = serial
         @pointer_x = x
         @pointer_y = y
         # 1. change cursor
@@ -532,6 +532,7 @@ module MiW
         else
           @pointer_enter_client = false
         end
+        set_default_cursor @serial_enter, hit_test(x, y)
         lasy_update
         commit_if_needed
       end
@@ -542,6 +543,7 @@ module MiW
           @client.pointer_leave
         end
         @nonclient.pointer_leave
+        reset_cursor
         lasy_update
         commit_if_needed
       end
@@ -590,6 +592,7 @@ module MiW
             @nonclient.pointer_motion time, x, y
           end
         end
+        set_default_cursor @serial_enter, hit_test(x, y) unless @current_pointer_handler
         lasy_update
         commit_if_needed
       end

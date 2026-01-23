@@ -191,7 +191,7 @@ module MiW
       ## WlPointer
 
       def on_wl_pointer_enter(serial, x, y)
-        @pointer_serial = serial
+        @serial = serial
         @pointer_x = x
         @pointer_y = y
         cx, cy = convert_to_client x, y
@@ -201,7 +201,7 @@ module MiW
       end
 
       def on_wl_pointer_leave(serial)
-        @pointer_serial = serial
+        @serial = serial
         @client.pointer_leave
         lasy_update
         commit_if_needed
@@ -217,13 +217,45 @@ module MiW
       end
 
       def on_wl_pointer_button(serial, time, button, state)
-        @pointer_serial = serial
+        @serial = serial
         @client.pointer_button(time, button, state)
         lasy_update
         commit_if_needed
       end
 
       def on_wl_pointer_axis(time, axis, value)
+      end
+
+      def set_default_cursor(serial, loc)
+        name = case loc
+               when :top_left
+                 "nw-resize"
+               when :top
+                 "n-resize"
+               when :top_right
+                 "ne-resize"
+               when :left
+                 "w-resize"
+               when :right
+                 "e-resize"
+               when :bottom_left
+                 "sw-resize"
+               when :bottom
+                 "s-resize"
+               when :bottom_right
+                 "se-resize"
+               else
+                 "arrow"
+               end
+        surface, hx, hy = MiW::Wl.cursor_surface name
+        if surface && @prev_name != name
+          @prev_name = name
+          @display[:wl_pointer].set_cursor serial, surface, hx, hy
+        end
+      end
+
+      def reset_cursor
+        @prev_name = nil
       end
 
       def on_wl_keyboard_key(serial, time, keysym, state)
@@ -251,6 +283,10 @@ module MiW
 
       def pulse
         @client&.pulse
+      end
+
+      def hit_test(x, y)
+        :client
       end
 
       # control methods
