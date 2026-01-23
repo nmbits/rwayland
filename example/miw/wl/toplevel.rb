@@ -477,7 +477,7 @@ module MiW
         states_diff = @states ^ next_states
         @states = next_states
         resized = false
-        if next_width == 0 || next_height == 0
+        if next_width == 0 || next_height == 0 || @window_geometry.nil?
           @window_geometry = @nonclient.initial_window_geometry @init_size.width,           @init_size.height,
                                                                 @xdg_toplevel.bounds_width, @xdg_toplevel.bounds_height,
                                                                 @states
