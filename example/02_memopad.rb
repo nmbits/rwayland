@@ -186,7 +186,7 @@ class ToplevelWindow
 end
 
 if __FILE__ == $0
-  MiW::Wl.init
+  MiW::Wl.init(cursor_theme: "default", cursor_size: 24)
   toplevel_window = ToplevelWindow.new 640, 480
   MiW::Wl.main_loop
 end
