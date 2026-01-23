@@ -143,6 +143,7 @@ module Wayland
       else
         display.socket.sendmsg message, 0, nil
       end
+      display.call_post_init obj, as if obj
       return obj
     end
 

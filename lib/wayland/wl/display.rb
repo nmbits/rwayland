@@ -151,7 +151,20 @@ module Wayland
         socket = UNIXSocket.new(path)
         object_manager = ObjectManager.new
         inst = object_manager.create_wl_display socket, as
+        call_post_init inst, as
         inst
+      end
+
+      def self.call_post_init(obj, mod)
+        if Array === mod && (mod.size > 1)
+          obj.post_init *mod.slice(1, mod.size - 1)
+        else
+          obj.post_init
+        end
+      end
+
+      def call_post_init(obj, mod)
+        self.class.call_post_init obj, mod
       end
     end
   end

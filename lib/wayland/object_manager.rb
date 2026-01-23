@@ -49,7 +49,6 @@ module Wayland
       oid ||= new_id
       obj = new_object(ifname, oid, mod)
       add_object obj
-      call_post_init obj, mod
       obj
     end
 
@@ -61,7 +60,6 @@ module Wayland
       obj.set_socket socket
       obj.set_object_manager self
       add_object obj
-      call_post_init obj, mod
       obj
     end
 
@@ -95,14 +93,6 @@ module Wayland
         raise ArgumentError
       end
       c
-    end
-
-    def call_post_init(obj, mod)
-      if Array === mod && (mod.size > 1)
-        obj.post_init *mod.slice(1, mod.size - 1)
-      else
-        obj.post_init
-      end
     end
 
     def new_object(ifname, oid, mod)
