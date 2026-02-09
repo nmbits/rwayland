@@ -14,8 +14,14 @@ module Wayland
         intf = Protocol[sym]
         if intf
           mod = @global_modules ? @global_modules[sym] : nil
-          bind name, interface, [version, intf[:version]].min, sym, as: mod
+          vr = [version, intf[:version]].min
+          bind name, interface, vr, sym, as: mod
+          (@interface_versions ||= Hash.new)[sym] = vr
         end
+      end
+
+      def interface_version(interface)
+        @interface_versions && @interface_versions[interface.to_sym]
       end
     end
   end
