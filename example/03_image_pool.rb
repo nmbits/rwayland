@@ -46,7 +46,7 @@ module Example03
     xdg_surface = display[:xdg_wm_base].get_xdg_surface wl_surface
     xdg_surface.on :configure do |serial|
       xdg_surface.ack_configure serial
-      buffer = ipool.get_buffer 0
+      buffer = ipool.create_buffer 0
       wl_surface.attach buffer, 0, 0
       wl_surface.commit
     end

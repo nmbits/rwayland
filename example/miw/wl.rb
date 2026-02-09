@@ -15,6 +15,10 @@ module MiW
       load_cursor_theme config[:cusor_theme], config[:cursor_size]
     end
 
+    module CursorBufferMixin
+      def release; destroy end
+    end
+
     def self.load_cursor_theme(theme, size)
       wl_shm = @display[:wl_shm]
       @cursor_surfaces = Hash.new
@@ -22,7 +26,7 @@ module MiW
       %w(nw-resize n-resize ne-resize  w-resize arrow e-resize sw-resize s-resize se-resize).each do |name|
         surface = @display[:wl_compositor].create_surface
         image = cursor_theme[name][0]
-        wl_buffer = image.wl_buffer
+        wl_buffer = image.create_buffer as: CursorBufferMixin
         surface.attach wl_buffer, 0, 0
         surface.commit
         @cursor_surfaces[name] = [surface, image.hotspot_x, image.hotspot_y]

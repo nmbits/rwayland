@@ -4,8 +4,7 @@ module Wayland
   module Util
     class ImagePool
       DEFAULT_POOL_SIZE = 4096
-      Entry = Struct.new(:offset, :attr, :buffer)
-      Attribute = Struct.new(:width, :height, :stride, :format)
+      Entry = Struct.new(:offset, :width, :height, :stride, :format)
 
       def initialize(wl_shm, size = nil)
         @size = size || DEFAULT_POOL_SIZE
@@ -17,6 +16,8 @@ module Wayland
 
       def add_image(width, height, stride, format, pixels)
         raise ArgumentError, "invalid size" if width <= 0 || height <= 0
+        raise ArgumentError, "invalid stride" if stride <= 0
+        raise ArgumentError, "pixels should not be nil" unless pixels
         asize = height * stride
         offset = @shm.allocate asize, resize: true
         if @size < @shm.size
@@ -25,31 +26,26 @@ module Wayland
         end
         @shm.write offset, pixels, asize
         index = @images.size
-        attr = Attribute.new(width, height, stride, format).freeze
-        @images << Entry.new(offset, attr, nil)
+        @images << Entry.new(offset, width, height, stride, format).freeze
         index
       end
 
-      def get_buffer(index, as: nil)
-        raise RangeError, "index out of range" if index < 0 || index >= @images.size
+      def create_buffer(index, as: nil)
+        raise RangeError, "out of range" if index < 0 || index >= @images.size
         e = @images[index]
-        unless e.buffer
-          a = e.attr
-          e.buffer = @pool.create_buffer e.offset, a.width, a.height, a.stride, a.format, as: as
-        end
-        e.buffer
+        buffer = @pool.create_buffer e.offset, e.width, e.height, e.stride, e.format, as: as
+        buffer
       end
 
       def attribute(index)
         raise RangeError, "index out of range" if index < 0 || index >= @images.size
-        @images[index].attr
+        @images[index]
       end
 
       def pixels(index)
         raise RangeError, "index out of range" if index < 0 || index >= @images.size
         e = @images[index]
-        a = attribute(index)
-        @shm.read(e.offset, a.height * a.stride)
+        @shm.read(e.offset, e.height * e.stride)
       end
     end
   end

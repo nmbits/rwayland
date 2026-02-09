@@ -10,8 +10,8 @@ module Wayland
       end
       attr_reader :cursor, :hotspot_x, :hotspot_y, :delay
 
-      def wl_buffer(as: nil)
-        @cursor.theme.image_pool.get_buffer(@index, as: as)
+      def create_buffer(as: nil)
+        @cursor.theme.image_pool.create_buffer(@index, as: as)
       end
 
       def width
@@ -61,8 +61,33 @@ module Wayland
       end
       attr_reader :name, :image_pool
 
+      SHAPES = %w[default    context_menu help        pointer     progress
+                  wait       cell         crosshair   text        vertical_text
+                  alias      copy         move        no_drop     not_allowed
+                  grab       grabbing     e_resize    n_resize    ne_resize
+                  nw_resize  s_resize     se_resize   sw_resize   w_resize
+                  ew_resize  ns_resize    nesw_resize nwse_resize col_resize
+                  row_resize all_scroll   zoom_in     zoom_out    dnd_ask
+                  all_resize]
+
+      def shape_to_name(shape)
+        if shape > 0 && shape <= SHAPES.size
+          SHAPES[shape - 1]
+        end
+      end
+      private :shape_to_name
+
       def [](name)
-        @cursors[name]
+        case name
+        when Integer
+          sname = shape_to_name name
+          raise ArgumentError unless sname
+        when String
+          sname = name.include?("-") ? name.gsub(/\-/, "_") : name
+        else
+          raise TypeError
+        end
+        return @cursors[sname]
       end
 
       def names
@@ -70,7 +95,8 @@ module Wayland
       end
 
       def add_cursor_image(name, width, height, hotspot_x, hotspot_y, delay, pixels)
-        cursor = (@cursors[name] ||= Cursor.new(self, name))
+        nml_name = name.gsub /\-/, "_"
+        cursor = (@cursors[nml_name] ||= Cursor.new(self, nml_name))
         index = @image_pool.add_image width, height, width * 4,
                                       Wayland::Wl::Shm[:format].argb8888, pixels
         image = CursorImage.new cursor, index, hotspot_x, hotspot_y, delay
