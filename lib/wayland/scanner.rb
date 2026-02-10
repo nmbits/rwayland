@@ -53,8 +53,11 @@ module Wayland
           entries = en.get_elements("entry")
           en_spec = { name: name }
           en_spec[:entries] = entries.map do |ent|
-            { name: ent.attribute("name").to_s.to_sym,
-              value: Integer(ent.attribute("value").to_s) }
+            h = { name: ent.attribute("name").to_s.to_sym,
+                  value: Integer(ent.attribute("value").to_s) }
+            s = ent.attribute("since")
+            h[:since] = s.to_s.to_i if s
+            h
           end
           enums << en_spec
         end
